@@ -21,6 +21,7 @@ export class TemplateUI {
   private searchQuery = "";
   private selectedTag = "";
   private showFavoritesOnly = false;
+  private collapsedGroups: Set<string> = new Set();
   private state: ViewState = { view: "list" };
 
   // Callbacks
@@ -109,12 +110,14 @@ export class TemplateUI {
     searchWrap.appendChild(eiWrap);
     this.container.appendChild(searchWrap);
 
-    // Category tabs
+    // Category tabs with count badges
     const tabs = el("div", "aps-tabs");
-    const allTab = this.makeTab("全部", "all");
+    const allCount = this.getCountForCategory("all");
+    const allTab = this.makeTab(`全部`, "all", allCount);
     tabs.appendChild(allTab);
     for (const cat of this.categories) {
-      tabs.appendChild(this.makeTab(`${cat.icon} ${cat.name}`, cat.id));
+      const count = this.getCountForCategory(cat.id);
+      tabs.appendChild(this.makeTab(`${cat.icon} ${cat.name}`, cat.id, count));
     }
     this.container.appendChild(tabs);
 
@@ -151,6 +154,43 @@ export class TemplateUI {
       const empty = el("div", "aps-empty");
       empty.innerHTML = `<div class="aps-empty-icon">📋</div><div>沒有符合的模板</div>`;
       list.appendChild(empty);
+    } else if (this.selectedCategory !== "all" && !this.selectedTag && !this.searchQuery.trim()) {
+      // Group by subcategory (tag) when viewing a specific category
+      const groups = this.groupByTag(filtered);
+      for (const group of groups) {
+        const isCollapsed = this.collapsedGroups.has(group.tag);
+        const section = el("div", "aps-subcategory-section");
+
+        const header = el("div", "aps-subcategory-header");
+        const arrow = el("span", "aps-subcategory-arrow" + (isCollapsed ? " collapsed" : ""));
+        arrow.textContent = "▾";
+        header.appendChild(arrow);
+        const headerLabel = el("span", "aps-subcategory-label");
+        headerLabel.textContent = group.tag;
+        header.appendChild(headerLabel);
+        const countBadge = el("span", "aps-subcategory-count");
+        countBadge.textContent = String(group.templates.length);
+        header.appendChild(countBadge);
+        header.addEventListener("click", () => {
+          if (this.collapsedGroups.has(group.tag)) {
+            this.collapsedGroups.delete(group.tag);
+          } else {
+            this.collapsedGroups.add(group.tag);
+          }
+          this.render();
+        });
+        section.appendChild(header);
+
+        if (!isCollapsed) {
+          const groupList = el("div", "aps-subcategory-list");
+          for (const tpl of group.templates) {
+            groupList.appendChild(this.makeCard(tpl));
+          }
+          section.appendChild(groupList);
+        }
+
+        list.appendChild(section);
+      }
     } else {
       for (const tpl of filtered) {
         list.appendChild(this.makeCard(tpl));
@@ -159,12 +199,50 @@ export class TemplateUI {
     this.container.appendChild(list);
   }
 
-  private makeTab(label: string, categoryId: string): HTMLButtonElement {
+  /** Group templates by their first tag (subcategory) */
+  private groupByTag(templates: Template[]): { tag: string; templates: Template[] }[] {
+    const map = new Map<string, Template[]>();
+    for (const tpl of templates) {
+      const tag = tpl.tags?.[0] ?? "其他";
+      const arr = map.get(tag);
+      if (arr) {
+        arr.push(tpl);
+      } else {
+        map.set(tag, [tpl]);
+      }
+    }
+    return [...map.entries()].map(([tag, tpls]) => ({ tag, templates: tpls }));
+  }
+
+  /** Count templates for a given category (respecting favorites filter) */
+  private getCountForCategory(categoryId: string): number {
+    let list = this.templates;
+    if (this.showFavoritesOnly) {
+      list = list.filter((t) => t.isFavorite);
+    }
+    if (categoryId !== "all") {
+      const cat = this.categories.find((c) => c.id === categoryId);
+      if (cat) list = list.filter((t) => t.category === cat.name);
+    }
+    return list.length;
+  }
+
+  private makeTab(label: string, categoryId: string, count?: number): HTMLButtonElement {
     const btn = el("button", "aps-tab") as HTMLButtonElement;
-    btn.textContent = label;
+    if (count !== undefined) {
+      const labelSpan = el("span");
+      labelSpan.textContent = label;
+      btn.appendChild(labelSpan);
+      const badge = el("span", "aps-tab-count");
+      badge.textContent = String(count);
+      btn.appendChild(badge);
+    } else {
+      btn.textContent = label;
+    }
     if (this.selectedCategory === categoryId) btn.classList.add("active");
     btn.addEventListener("click", () => {
       this.selectedCategory = categoryId;
+      this.selectedTag = "";
       this.render();
     });
     return btn;

@@ -118,14 +118,14 @@ export async function initDefaults(defaultsUrl: string): Promise<void> {
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const defaults = (await resp.json()) as {
       categories: Category[];
-      templates: Omit<Template, "id" | "variables" | "createdAt" | "updatedAt">[];
+      templates: Omit<Template, "id" | "createdAt" | "updatedAt">[];
     };
 
     const now = Date.now();
     const templates: Template[] = defaults.templates.map((t) => ({
       ...t,
       id: crypto.randomUUID(),
-      variables: extractVariables(t.content),
+      variables: t.variables && t.variables.length > 0 ? t.variables : extractVariables(t.content),
       createdAt: now,
       updatedAt: now,
     }));
