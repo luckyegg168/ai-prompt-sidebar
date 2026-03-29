@@ -1,0 +1,45 @@
+{
+  "manifest_version": 3,
+  "name": "AI Prompt Sidebar",
+  "version": "1.0.0",
+  "description": "在 AI 聊天平台注入浮動側邊欄，提供金融分析提示詞模板，支援一鍵填入並送出。",
+  "permissions": ["storage", "activeTab"],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://x.com/i/grok*",
+        "https://grok.com/*",
+        "https://gemini.google.com/*"
+      ],
+      "js": ["content.js"],
+      "css": ["sidebar.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["defaults.json"],
+      "matches": [
+        "https://x.com/*",
+        "https://grok.com/*",
+        "https://gemini.google.com/*"
+      ]
+    }
+  ]
+}

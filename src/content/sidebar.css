@@ -1,0 +1,464 @@
+/* ============================================================
+   AI Prompt Sidebar — Injected Panel Styles
+   ============================================================ */
+
+:root {
+  --aps-width: 340px;
+  --aps-bg: #ffffff;
+  --aps-bg-secondary: #f7f8fa;
+  --aps-text: #1a1a2e;
+  --aps-text-secondary: #64748b;
+  --aps-border: #e2e8f0;
+  --aps-accent: #6366f1;
+  --aps-accent-hover: #4f46e5;
+  --aps-accent-light: #eef2ff;
+  --aps-success: #22c55e;
+  --aps-danger: #ef4444;
+  --aps-danger-hover: #dc2626;
+  --aps-radius: 10px;
+  --aps-radius-sm: 6px;
+  --aps-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --aps-transition: 0.2s ease;
+}
+
+/* Dark theme overrides */
+.aps-dark {
+  --aps-bg: #1e1e2e;
+  --aps-bg-secondary: #282840;
+  --aps-text: #e2e8f0;
+  --aps-text-secondary: #94a3b8;
+  --aps-border: #3b3b5c;
+  --aps-accent: #818cf8;
+  --aps-accent-hover: #6366f1;
+  --aps-accent-light: #312e5c;
+  --aps-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Container ─────────────────────────────── */
+#aps-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: var(--aps-width);
+  height: 100vh;
+  background: var(--aps-bg);
+  color: var(--aps-text);
+  border-left: 1px solid var(--aps-border);
+  box-shadow: var(--aps-shadow);
+  z-index: 2147483640;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  transition: transform var(--aps-transition);
+  overflow: hidden;
+}
+
+#aps-sidebar.aps-hidden {
+  transform: translateX(100%);
+}
+
+/* ── Toggle Button ─────────────────────────── */
+#aps-toggle-btn {
+  position: fixed;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2147483641;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--aps-accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.4);
+  transition: all var(--aps-transition);
+  user-select: none;
+}
+
+#aps-toggle-btn:hover {
+  background: var(--aps-accent-hover);
+  transform: translateY(-50%) scale(1.1);
+}
+
+#aps-toggle-btn.aps-open {
+  right: calc(var(--aps-width) + 12px);
+}
+
+/* ── Header ────────────────────────────────── */
+.aps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--aps-border);
+  flex-shrink: 0;
+}
+
+.aps-header h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aps-header-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.aps-icon-btn {
+  background: none;
+  border: 1px solid var(--aps-border);
+  border-radius: var(--aps-radius-sm);
+  color: var(--aps-text-secondary);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all var(--aps-transition);
+}
+
+.aps-icon-btn:hover {
+  background: var(--aps-accent-light);
+  color: var(--aps-accent);
+  border-color: var(--aps-accent);
+}
+
+/* ── Search ────────────────────────────────── */
+.aps-search {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--aps-border);
+  flex-shrink: 0;
+}
+
+.aps-search input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--aps-border);
+  border-radius: var(--aps-radius-sm);
+  background: var(--aps-bg-secondary);
+  color: var(--aps-text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--aps-transition);
+  box-sizing: border-box;
+}
+
+.aps-search input:focus {
+  border-color: var(--aps-accent);
+}
+
+.aps-search input::placeholder {
+  color: var(--aps-text-secondary);
+}
+
+/* ── Category Tabs ─────────────────────────── */
+.aps-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 16px 0;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.aps-tab {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--aps-border);
+  background: transparent;
+  color: var(--aps-text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--aps-transition);
+}
+
+.aps-tab:hover {
+  background: var(--aps-accent-light);
+  color: var(--aps-accent);
+}
+
+.aps-tab.active {
+  background: var(--aps-accent);
+  color: #fff;
+  border-color: var(--aps-accent);
+}
+
+/* ── Template List ─────────────────────────── */
+.aps-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 16px;
+}
+
+.aps-template-card {
+  background: var(--aps-bg-secondary);
+  border: 1px solid var(--aps-border);
+  border-radius: var(--aps-radius);
+  padding: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all var(--aps-transition);
+}
+
+.aps-template-card:hover {
+  border-color: var(--aps-accent);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+}
+
+.aps-template-card .aps-card-name {
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+
+.aps-template-card .aps-card-preview {
+  color: var(--aps-text-secondary);
+  font-size: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.aps-template-card .aps-card-tags {
+  margin-top: 6px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.aps-var-tag {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--aps-accent-light);
+  color: var(--aps-accent);
+  font-size: 11px;
+}
+
+/* ── Variable Form (detail view) ───────────── */
+.aps-detail {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.aps-detail-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.aps-detail-content {
+  background: var(--aps-bg-secondary);
+  border-radius: var(--aps-radius-sm);
+  padding: 10px;
+  font-size: 12px;
+  color: var(--aps-text-secondary);
+  margin-bottom: 16px;
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+
+.aps-form-group {
+  margin-bottom: 12px;
+}
+
+.aps-form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--aps-text-secondary);
+}
+
+.aps-form-group input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--aps-border);
+  border-radius: var(--aps-radius-sm);
+  background: var(--aps-bg-secondary);
+  color: var(--aps-text);
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--aps-transition);
+}
+
+.aps-form-group input:focus {
+  border-color: var(--aps-accent);
+}
+
+/* ── Action Buttons ────────────────────────── */
+.aps-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--aps-border);
+  flex-shrink: 0;
+}
+
+.aps-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--aps-radius-sm);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all var(--aps-transition);
+}
+
+.aps-btn-primary {
+  background: var(--aps-accent);
+  color: #fff;
+}
+
+.aps-btn-primary:hover {
+  background: var(--aps-accent-hover);
+}
+
+.aps-btn-secondary {
+  background: var(--aps-bg-secondary);
+  color: var(--aps-text);
+  border: 1px solid var(--aps-border);
+}
+
+.aps-btn-secondary:hover {
+  background: var(--aps-accent-light);
+  color: var(--aps-accent);
+}
+
+.aps-btn-danger {
+  background: var(--aps-danger);
+  color: #fff;
+}
+
+.aps-btn-danger:hover {
+  background: var(--aps-danger-hover);
+}
+
+/* ── Back button ───────────────────────────── */
+.aps-back-btn {
+  background: none;
+  border: none;
+  color: var(--aps-accent);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.aps-back-btn:hover {
+  text-decoration: underline;
+}
+
+/* ── Toast ─────────────────────────────────── */
+.aps-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483647;
+  padding: 10px 18px;
+  border-radius: var(--aps-radius-sm);
+  background: var(--aps-success);
+  color: #fff;
+  font-size: 13px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  animation: aps-toast-in 0.3s ease, aps-toast-out 0.3s ease 2s forwards;
+}
+
+@keyframes aps-toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes aps-toast-out {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateY(12px); }
+}
+
+/* ── Empty State ───────────────────────────── */
+.aps-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--aps-text-secondary);
+}
+
+.aps-empty-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+/* ── Custom template form ──────────────────── */
+.aps-create-form {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.aps-form-group textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 8px 10px;
+  border: 1px solid var(--aps-border);
+  border-radius: var(--aps-radius-sm);
+  background: var(--aps-bg-secondary);
+  color: var(--aps-text);
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color var(--aps-transition);
+}
+
+.aps-form-group textarea:focus {
+  border-color: var(--aps-accent);
+}
+
+/* ── Scrollbar ─────────────────────────────── */
+.aps-list::-webkit-scrollbar,
+.aps-detail::-webkit-scrollbar,
+.aps-create-form::-webkit-scrollbar {
+  width: 5px;
+}
+
+.aps-list::-webkit-scrollbar-thumb,
+.aps-detail::-webkit-scrollbar-thumb,
+.aps-create-form::-webkit-scrollbar-thumb {
+  background: var(--aps-border);
+  border-radius: 10px;
+}
+
+/* ── Platform badge ────────────────────────── */
+.aps-platform-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  background: #fef3c7;
+  color: #92400e;
+  margin-left: 4px;
+}
+
+.aps-dark .aps-platform-badge {
+  background: #422006;
+  color: #fbbf24;
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Prompt Sidebar</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <span class="popup-logo">📊</span>
+      <h1>AI Prompt Sidebar</h1>
+    </div>
+
+    <div class="popup-section">
+      <label class="popup-label">主題</label>
+      <select id="theme-select" class="popup-select">
+        <option value="auto">自動偵測</option>
+        <option value="light">淺色</option>
+        <option value="dark">深色</option>
+      </select>
+    </div>
+
+    <div class="popup-section">
+      <label class="popup-label">
+        <input type="checkbox" id="auto-show" />
+        自動顯示側邊欄
+      </label>
+    </div>
+
+    <div class="popup-section">
+      <label class="popup-label">側邊欄寬度</label>
+      <div class="popup-range-wrapper">
+        <input type="range" id="sidebar-width" min="280" max="500" step="10" />
+        <span id="width-value">340</span>px
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button id="toggle-btn" class="popup-btn popup-btn-primary">
+        切換側邊欄
+      </button>
+      <button id="reset-btn" class="popup-btn popup-btn-danger">
+        重設為預設模板
+      </button>
+    </div>
+
+    <div class="popup-footer">
+      <span>v1.0.0 · 支援 Grok / Gemini</span>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
