@@ -12,7 +12,9 @@
       "matches": [
         "https://x.com/i/grok*",
         "https://grok.com/*",
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*",
+        "https://claude.ai/*"
       ],
       "js": ["content.js"],
       "css": ["sidebar.css"],
@@ -38,7 +40,9 @@
       "matches": [
         "https://x.com/*",
         "https://grok.com/*",
-        "https://gemini.google.com/*"
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*",
+        "https://claude.ai/*"
       ]
     }
   ]

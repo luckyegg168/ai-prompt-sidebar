@@ -143,4 +143,90 @@ export class GeminiAdapter implements PlatformAdapter {
   }
 }
 
-ALL_ADAPTERS = [new GrokAdapter(), new GeminiAdapter()];
+export class ChatGPTAdapter implements PlatformAdapter {
+  name = "ChatGPT";
+
+  matchUrl(url: string): boolean {
+    return url.startsWith("https://chatgpt.com");
+  }
+
+  getInputElement(): HTMLElement | null {
+    return (
+      document.querySelector<HTMLElement>("#prompt-textarea") ??
+      document.querySelector<HTMLElement>('div[contenteditable="true"]') ??
+      document.querySelector<HTMLElement>("textarea")
+    );
+  }
+
+  setText(el: HTMLElement, text: string): void {
+    if (el instanceof HTMLTextAreaElement) {
+      const nativeSetter = Object.getOwnPropertyDescriptor(
+        HTMLTextAreaElement.prototype,
+        "value"
+      )?.set;
+      if (nativeSetter) nativeSetter.call(el, text);
+      else el.value = text;
+      dispatchInput(el);
+    } else {
+      // ProseMirror contenteditable
+      el.innerHTML = `<p>${text.replace(/\n/g, "</p><p>")}</p>`;
+      dispatchInput(el);
+    }
+  }
+
+  submit(el: HTMLElement): void {
+    const sendBtn =
+      document.querySelector<HTMLElement>('button[data-testid="send-button"]') ??
+      document.querySelector<HTMLElement>('button[aria-label="Send prompt"]');
+    if (sendBtn) {
+      sendBtn.click();
+      return;
+    }
+    el.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
+    );
+  }
+
+  getTheme(): "light" | "dark" {
+    return document.documentElement.classList.contains("dark") ? "dark" : "light";
+  }
+}
+
+export class ClaudeAdapter implements PlatformAdapter {
+  name = "Claude";
+
+  matchUrl(url: string): boolean {
+    return url.startsWith("https://claude.ai");
+  }
+
+  getInputElement(): HTMLElement | null {
+    return (
+      document.querySelector<HTMLElement>('div[contenteditable="true"].ProseMirror') ??
+      document.querySelector<HTMLElement>('div[contenteditable="true"]')
+    );
+  }
+
+  setText(el: HTMLElement, text: string): void {
+    el.innerHTML = `<p>${text.replace(/\n/g, "</p><p>")}</p>`;
+    dispatchInput(el);
+  }
+
+  submit(el: HTMLElement): void {
+    const sendBtn =
+      document.querySelector<HTMLElement>('button[aria-label="Send Message"]') ??
+      document.querySelector<HTMLElement>('button[aria-label="Send message"]');
+    if (sendBtn) {
+      sendBtn.click();
+      return;
+    }
+    el.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
+    );
+  }
+
+  getTheme(): "light" | "dark" {
+    return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  }
+}
+
+ALL_ADAPTERS = [new GrokAdapter(), new GeminiAdapter(), new ChatGPTAdapter(), new ClaudeAdapter()];

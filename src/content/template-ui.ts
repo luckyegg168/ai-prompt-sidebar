@@ -9,7 +9,8 @@ import { PlatformAdapter } from "../adapters/base";
 type ViewState =
   | { view: "list" }
   | { view: "detail"; template: Template }
-  | { view: "create" };
+  | { view: "create" }
+  | { view: "edit"; template: Template };
 
 export class TemplateUI {
   private container: HTMLElement;
@@ -22,7 +23,10 @@ export class TemplateUI {
 
   // Callbacks
   onAddTemplate?: (name: string, category: string, content: string) => void;
+  onUpdateTemplate?: (id: string, name: string, category: string, content: string) => void;
   onDeleteTemplate?: (id: string) => void;
+  onExportTemplates?: () => void;
+  onImportTemplates?: () => void;
 
   constructor(
     container: HTMLElement,
@@ -55,6 +59,9 @@ export class TemplateUI {
       case "create":
         this.renderCreateForm();
         break;
+      case "edit":
+        this.renderEditForm(this.state.template);
+        break;
     }
   }
 
@@ -70,6 +77,19 @@ export class TemplateUI {
       this.render();
     });
     searchWrap.appendChild(searchInput);
+    // Export/Import buttons
+    const eiWrap = el("div", "aps-search-actions");
+    const exportBtn = el("button", "aps-icon-btn") as HTMLButtonElement;
+    exportBtn.textContent = "📤";
+    exportBtn.title = "匯出模板";
+    exportBtn.addEventListener("click", () => this.onExportTemplates?.());
+    const importBtn = el("button", "aps-icon-btn") as HTMLButtonElement;
+    importBtn.textContent = "📥";
+    importBtn.title = "匯入模板";
+    importBtn.addEventListener("click", () => this.onImportTemplates?.());
+    eiWrap.appendChild(exportBtn);
+    eiWrap.appendChild(importBtn);
+    searchWrap.appendChild(eiWrap);
     this.container.appendChild(searchWrap);
 
     // Category tabs
@@ -208,11 +228,30 @@ export class TemplateUI {
       this.injectText(fillTemplate(tpl.content, values));
     });
 
+    const copyBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    copyBtn.textContent = "📄 複製";
+    copyBtn.addEventListener("click", () => {
+      const values = this.collectValues(inputs);
+      const text = fillTemplate(tpl.content, values);
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("✅ 已複製到剪貼簿");
+      });
+    });
+
     const sendBtn = el("button", "aps-btn aps-btn-primary") as HTMLButtonElement;
     sendBtn.textContent = "🚀 填入並送出";
     sendBtn.addEventListener("click", () => {
       const values = this.collectValues(inputs);
       this.injectAndSubmit(fillTemplate(tpl.content, values));
+    });
+
+    const editBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    editBtn.textContent = "✏️";
+    editBtn.style.flex = "0";
+    editBtn.style.padding = "10px 14px";
+    editBtn.addEventListener("click", () => {
+      this.state = { view: "edit", template: tpl };
+      this.render();
     });
 
     const delBtn = el("button", "aps-btn aps-btn-danger") as HTMLButtonElement;
@@ -226,7 +265,9 @@ export class TemplateUI {
     });
 
     actions.appendChild(fillBtn);
+    actions.appendChild(copyBtn);
     actions.appendChild(sendBtn);
+    actions.appendChild(editBtn);
     actions.appendChild(delBtn);
     this.container.appendChild(actions);
   }
@@ -300,6 +341,81 @@ export class TemplateUI {
     const cancelBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
     cancelBtn.textContent = "取消";
     cancelBtn.addEventListener("click", () => this.goToList());
+
+    actions.appendChild(cancelBtn);
+    actions.appendChild(saveBtn);
+    this.container.appendChild(actions);
+  }
+
+  /* ─── Edit Form ───────────────────── */
+  private renderEditForm(tpl: Template): void {
+    const form = el("div", "aps-create-form");
+
+    const backBtn = el("button", "aps-back-btn");
+    backBtn.innerHTML = "← 返回";
+    backBtn.addEventListener("click", () => {
+      this.state = { view: "detail", template: tpl };
+      this.render();
+    });
+    form.appendChild(backBtn);
+
+    const title = el("div", "aps-detail-title");
+    title.textContent = "編輯模板";
+    form.appendChild(title);
+
+    // Name
+    const nameGroup = el("div", "aps-form-group");
+    const nameLabel = el("label");
+    nameLabel.textContent = "模板名稱";
+    nameGroup.appendChild(nameLabel);
+    const nameInput = el("input") as HTMLInputElement;
+    nameInput.value = tpl.name;
+    nameGroup.appendChild(nameInput);
+    form.appendChild(nameGroup);
+
+    // Category
+    const catGroup = el("div", "aps-form-group");
+    const catLabel = el("label");
+    catLabel.textContent = "分類";
+    catGroup.appendChild(catLabel);
+    const catInput = el("input") as HTMLInputElement;
+    catInput.value = tpl.category;
+    catGroup.appendChild(catInput);
+    form.appendChild(catGroup);
+
+    // Content
+    const contentGroup = el("div", "aps-form-group");
+    const contentLabel = el("label");
+    contentLabel.textContent = "模板內容（使用 {{變數名}} 標記變數）";
+    contentGroup.appendChild(contentLabel);
+    const contentInput = document.createElement("textarea");
+    contentInput.value = tpl.content;
+    contentGroup.appendChild(contentInput);
+    form.appendChild(contentGroup);
+
+    this.container.appendChild(form);
+
+    // Actions
+    const actions = el("div", "aps-actions");
+    const saveBtn = el("button", "aps-btn aps-btn-primary") as HTMLButtonElement;
+    saveBtn.textContent = "💾 儲存變更";
+    saveBtn.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      const cat = catInput.value.trim();
+      const content = contentInput.value.trim();
+      if (!name || !content) {
+        showToast("請填寫模板名稱和內容", true);
+        return;
+      }
+      this.onUpdateTemplate?.(tpl.id, name, cat || "自訂", content);
+    });
+
+    const cancelBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    cancelBtn.textContent = "取消";
+    cancelBtn.addEventListener("click", () => {
+      this.state = { view: "detail", template: tpl };
+      this.render();
+    });
 
     actions.appendChild(cancelBtn);
     actions.appendChild(saveBtn);
