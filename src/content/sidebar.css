@@ -537,11 +537,24 @@
   border-color: var(--aps-accent);
 }
 
-/* ── Scrollbar ─────────────────────────────── */
+/* ── Scrollbar (always visible) ────────────── */
+.aps-list,
+.aps-detail,
+.aps-create-form {
+  overflow-y: scroll;
+}
+
 .aps-list::-webkit-scrollbar,
 .aps-detail::-webkit-scrollbar,
 .aps-create-form::-webkit-scrollbar {
   width: 5px;
+}
+
+.aps-list::-webkit-scrollbar-track,
+.aps-detail::-webkit-scrollbar-track,
+.aps-create-form::-webkit-scrollbar-track {
+  background: var(--aps-bg-secondary);
+  border-radius: 10px;
 }
 
 .aps-list::-webkit-scrollbar-thumb,
@@ -549,6 +562,12 @@
 .aps-create-form::-webkit-scrollbar-thumb {
   background: var(--aps-border);
   border-radius: 10px;
+}
+
+.aps-list::-webkit-scrollbar-thumb:hover,
+.aps-detail::-webkit-scrollbar-thumb:hover,
+.aps-create-form::-webkit-scrollbar-thumb:hover {
+  background: var(--aps-text-secondary);
 }
 
 /* ── Platform badge ────────────────────────── */
