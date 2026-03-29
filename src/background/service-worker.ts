@@ -3,18 +3,20 @@
  */
 
 chrome.runtime.onInstalled.addListener(() => {
-  // Create context menu item
-  chrome.contextMenus?.create({
-    id: "aps-toggle",
-    title: "切換 AI Prompt Sidebar",
-    contexts: ["page"],
-    documentUrlPatterns: [
-      "https://x.com/i/grok*",
-      "https://grok.com/*",
-      "https://gemini.google.com/*",
-      "https://chatgpt.com/*",
-      "https://claude.ai/*",
-    ],
+  // Remove all existing menus to avoid duplicate ID errors on update
+  chrome.contextMenus?.removeAll(() => {
+    chrome.contextMenus?.create({
+      id: "aps-toggle",
+      title: "切換 AI Prompt Sidebar",
+      contexts: ["page"],
+      documentUrlPatterns: [
+        "https://x.com/i/grok*",
+        "https://grok.com/*",
+        "https://gemini.google.com/*",
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+      ],
+    });
   });
 });
 

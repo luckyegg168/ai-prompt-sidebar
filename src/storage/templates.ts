@@ -105,11 +105,17 @@ export async function deleteTemplate(id: string): Promise<void> {
 }
 
 export async function initDefaults(defaultsUrl: string): Promise<void> {
-  const data = await loadAll();
-  if (data.templates.length > 0) return; // already initialised
+  // Use a sentinel flag to prevent race conditions across multiple tabs
+  const result = await new Promise<Record<string, unknown>>((resolve) => {
+    getStorage().get({ templates: [], aps_initialized: false }, resolve);
+  });
+  if (result.aps_initialized || (Array.isArray(result.templates) && (result.templates as unknown[]).length > 0)) {
+    return;
+  }
 
   try {
     const resp = await fetch(defaultsUrl);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const defaults = (await resp.json()) as {
       categories: Category[];
       templates: Omit<Template, "id" | "variables" | "createdAt" | "updatedAt">[];
@@ -124,8 +130,13 @@ export async function initDefaults(defaultsUrl: string): Promise<void> {
       updatedAt: now,
     }));
 
-    await saveTemplates(templates);
-    await saveCategories(defaults.categories);
+    // Atomic write with sentinel to prevent double-init from parallel tabs
+    await new Promise<void>((resolve) => {
+      getStorage().set(
+        { templates, categories: defaults.categories, aps_initialized: true },
+        resolve
+      );
+    });
   } catch (err) {
     console.error("[AISidebar] Failed to load defaults:", err);
   }

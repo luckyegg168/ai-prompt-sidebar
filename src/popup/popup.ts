@@ -55,8 +55,8 @@ resetBtn.addEventListener("click", async () => {
   await saveSettings(DEFAULT_SETTINGS);
   await saveTemplates([]);
   await saveCategories([]);
-  // Re-initialise from defaults on next page load
-  notifyContentScript("SETTINGS_CHANGED");
+  // Tell content script to re-initialise defaults
+  notifyContentScript("RESET_DEFAULTS");
   window.close();
 });
 

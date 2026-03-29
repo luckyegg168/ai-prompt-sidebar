@@ -13,6 +13,18 @@ function dispatchInput(el: HTMLElement): void {
   el.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
+/** Safely set contenteditable innerHTML using textContent (prevents XSS) */
+function setContentEditableText(el: HTMLElement, text: string): void {
+  el.innerHTML = "";
+  const lines = text.split("\n");
+  for (const line of lines) {
+    const p = document.createElement("p");
+    p.textContent = line;
+    el.appendChild(p);
+  }
+  dispatchInput(el);
+}
+
 export function detectAdapter(): PlatformAdapter | null {
   const url = window.location.href;
   for (const adapter of ALL_ADAPTERS) {
@@ -113,9 +125,8 @@ export class GeminiAdapter implements PlatformAdapter {
       }
       dispatchInput(el);
     } else {
-      // Quill/contenteditable — set via innerHTML to trigger Quill update
-      el.innerHTML = `<p>${text.replace(/\n/g, "</p><p>")}</p>`;
-      dispatchInput(el);
+      // Quill/contenteditable — safe DOM construction
+      setContentEditableText(el, text);
     }
   }
 
@@ -168,9 +179,8 @@ export class ChatGPTAdapter implements PlatformAdapter {
       else el.value = text;
       dispatchInput(el);
     } else {
-      // ProseMirror contenteditable
-      el.innerHTML = `<p>${text.replace(/\n/g, "</p><p>")}</p>`;
-      dispatchInput(el);
+      // ProseMirror contenteditable — safe DOM construction
+      setContentEditableText(el, text);
     }
   }
 
@@ -207,8 +217,7 @@ export class ClaudeAdapter implements PlatformAdapter {
   }
 
   setText(el: HTMLElement, text: string): void {
-    el.innerHTML = `<p>${text.replace(/\n/g, "</p><p>")}</p>`;
-    dispatchInput(el);
+    setContentEditableText(el, text);
   }
 
   submit(el: HTMLElement): void {

@@ -19,6 +19,9 @@ import { Template, extractVariables } from "../models/template";
 import { TemplateUI, showToast } from "./template-ui";
 
 (async function main() {
+  // Prevent duplicate injection
+  if (document.getElementById("aps-sidebar")) return;
+
   // Detect current platform
   const adapter = detectAdapter();
   if (!adapter) return; // unsupported page
@@ -93,35 +96,37 @@ import { TemplateUI, showToast } from "./template-ui";
   ui.setData(templates, categories);
 
   // Callbacks
+  /** Refresh UI with fresh data from storage */
+  async function refreshUI() {
+    const freshT = await getTemplates();
+    const freshC = await getCategories();
+    ui.setData(freshT, freshC);
+  }
+
   ui.onAddTemplate = async (name, category, content) => {
     await addTemplate({ name, category, content });
-    const fresh = await getTemplates();
-    ui.setData(fresh, categories);
+    await refreshUI();
     ui.goToList();
     showToast("✅ 模板已儲存");
   };
 
   ui.onDeleteTemplate = async (id) => {
     await deleteTemplate(id);
-    const fresh = await getTemplates();
-    ui.setData(fresh, categories);
+    await refreshUI();
     ui.goToList();
     showToast("🗑️ 模板已刪除");
   };
 
   ui.onUpdateTemplate = async (id, name, category, content) => {
     await updateTemplate(id, { name, category, content });
-    const freshT = await getTemplates();
-    const freshC = await getCategories();
-    ui.setData(freshT, freshC);
+    await refreshUI();
     ui.goToList();
     showToast("✅ 模板已更新");
   };
 
   ui.onToggleFavorite = async (id, isFavorite) => {
     await updateTemplate(id, { isFavorite });
-    const freshT = await getTemplates();
-    ui.setData(freshT, categories);
+    await refreshUI();
   };
 
   ui.onExportTemplates = async () => {
@@ -161,7 +166,7 @@ import { TemplateUI, showToast } from "./template-ui";
           content: String(t.content ?? ""),
           variables: extractVariables(String(t.content ?? "")),
           platform: t.platform ? String(t.platform) : undefined,
-          tags: Array.isArray(t.tags) ? t.tags.map(String) : undefined,
+          tags: Array.isArray(t.tags) ? t.tags.map(String).filter((s: string) => s.length <= 50) : undefined,
           createdAt: now,
           updatedAt: now,
         }));
@@ -170,9 +175,18 @@ import { TemplateUI, showToast } from "./template-ui";
         if (Array.isArray(data.categories)) {
           const existingCats = await getCategories();
           const existingNames = new Set(existingCats.map((c) => c.name));
-          const newCats = data.categories.filter(
-            (c: { name: string }) => !existingNames.has(c.name)
-          );
+          const newCats = data.categories
+            .filter((c: unknown): boolean => {
+              if (typeof c !== "object" || c === null) return false;
+              const obj = c as Record<string, unknown>;
+              return (
+                typeof obj.id === "string" &&
+                typeof obj.name === "string" &&
+                typeof obj.icon === "string" &&
+                typeof obj.order === "number"
+              );
+            })
+            .filter((c: { name: string }) => !existingNames.has(c.name));
           if (newCats.length > 0) {
             await saveCategories([...existingCats, ...newCats]);
           }
@@ -202,10 +216,9 @@ import { TemplateUI, showToast } from "./template-ui";
 
   // ── SPA navigation detection ────────────────
   let lastUrl = location.href;
-  const observer = new MutationObserver(() => {
+  function checkUrlChange() {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
-      // Re-detect adapter on navigation
       const newAdapter = detectAdapter();
       if (!newAdapter) {
         sidebar.classList.add("aps-hidden");
@@ -214,8 +227,22 @@ import { TemplateUI, showToast } from "./template-ui";
         toggleBtn.style.display = "";
       }
     }
+  }
+
+  // Primary: listen for History API navigation events
+  window.addEventListener("popstate", checkUrlChange);
+  window.addEventListener("hashchange", checkUrlChange);
+
+  // Fallback: debounced MutationObserver for pushState (not caught by popstate)
+  let urlCheckTimer: ReturnType<typeof setTimeout> | null = null;
+  const observer = new MutationObserver(() => {
+    if (urlCheckTimer) return;
+    urlCheckTimer = setTimeout(() => {
+      urlCheckTimer = null;
+      checkUrlChange();
+    }, 300);
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.body, { childList: true, subtree: false });
 
   // ── Listen for messages from popup/service-worker ──
   chrome.runtime.onMessage.addListener((msg) => {
@@ -228,6 +255,21 @@ import { TemplateUI, showToast } from "./template-ui";
         const newTheme = s.theme === "auto" ? adapter.getTheme() : s.theme;
         sidebar.classList.toggle("aps-dark", newTheme === "dark");
         sidebar.style.setProperty("--aps-width", `${s.sidebarWidth}px`);
+      });
+    }
+    if (msg.type === "RESET_DEFAULTS") {
+      // Clear sentinel so initDefaults can re-run after reset
+      chrome.storage.local.remove("aps_initialized", () => {
+        initDefaults(defaultsUrl)
+          .then(async () => {
+            await refreshUI();
+            const s = await getSettings();
+            const newTheme = s.theme === "auto" ? adapter.getTheme() : s.theme;
+            sidebar.classList.toggle("aps-dark", newTheme === "dark");
+            sidebar.style.setProperty("--aps-width", `${s.sidebarWidth}px`);
+            showToast("✅ 已重設為預設模板");
+          })
+          .catch(() => showToast("重設失敗，請重試", true));
       });
     }
   });

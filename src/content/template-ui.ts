@@ -75,9 +75,13 @@ export class TemplateUI {
     const searchInput = el("input") as HTMLInputElement;
     searchInput.placeholder = "🔍 搜尋模板…";
     searchInput.value = this.searchQuery;
+    let searchTimer: ReturnType<typeof setTimeout> | null = null;
     searchInput.addEventListener("input", () => {
-      this.searchQuery = searchInput.value;
-      this.render();
+      if (searchTimer) clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        this.searchQuery = searchInput.value;
+        this.render();
+      }, 150);
     });
     searchWrap.appendChild(searchInput);
     // Export/Import buttons
@@ -392,14 +396,32 @@ export class TemplateUI {
     nameGroup.appendChild(nameInput);
     form.appendChild(nameGroup);
 
-    // Category
+    // Category (dropdown + custom option)
     const catGroup = el("div", "aps-form-group");
     const catLabel = el("label");
-    catLabel.textContent = "分類";
+    catLabel.textContent = "��類";
     catGroup.appendChild(catLabel);
-    const catInput = el("input") as HTMLInputElement;
-    catInput.placeholder = "例如：選股分析";
-    catGroup.appendChild(catInput);
+    const catSelect = document.createElement("select") as HTMLSelectElement;
+    catSelect.className = "aps-form-select";
+    for (const c of this.categories) {
+      const opt = document.createElement("option");
+      opt.value = c.name;
+      opt.textContent = `${c.icon} ${c.name}`;
+      catSelect.appendChild(opt);
+    }
+    const customOpt = document.createElement("option");
+    customOpt.value = "__custom__";
+    customOpt.textContent = "＋ 自訂分類…";
+    catSelect.appendChild(customOpt);
+    catGroup.appendChild(catSelect);
+    const catCustomInput = el("input") as HTMLInputElement;
+    catCustomInput.placeholder = "輸入自訂分類名稱";
+    catCustomInput.style.display = "none";
+    catCustomInput.style.marginTop = "6px";
+    catGroup.appendChild(catCustomInput);
+    catSelect.addEventListener("change", () => {
+      catCustomInput.style.display = catSelect.value === "__custom__" ? "" : "none";
+    });
     form.appendChild(catGroup);
 
     // Content
@@ -418,10 +440,10 @@ export class TemplateUI {
     // Actions
     const actions = el("div", "aps-actions");
     const saveBtn = el("button", "aps-btn aps-btn-primary") as HTMLButtonElement;
-    saveBtn.textContent = "💾 儲存模板";
+    saveBtn.textContent = "💾 儲存模��";
     saveBtn.addEventListener("click", () => {
       const name = nameInput.value.trim();
-      const cat = catInput.value.trim();
+      const cat = catSelect.value === "__custom__" ? catCustomInput.value.trim() : catSelect.value;
       const content = contentInput.value.trim();
       if (!name || !content) {
         showToast("請填寫模板名稱和內容", true);
@@ -465,14 +487,39 @@ export class TemplateUI {
     nameGroup.appendChild(nameInput);
     form.appendChild(nameGroup);
 
-    // Category
+    // Category (dropdown + custom option)
     const catGroup = el("div", "aps-form-group");
     const catLabel = el("label");
     catLabel.textContent = "分類";
     catGroup.appendChild(catLabel);
-    const catInput = el("input") as HTMLInputElement;
-    catInput.value = tpl.category;
-    catGroup.appendChild(catInput);
+    const catSelect = document.createElement("select") as HTMLSelectElement;
+    catSelect.className = "aps-form-select";
+    let foundCategory = false;
+    for (const c of this.categories) {
+      const opt = document.createElement("option");
+      opt.value = c.name;
+      opt.textContent = `${c.icon} ${c.name}`;
+      if (c.name === tpl.category) {
+        opt.selected = true;
+        foundCategory = true;
+      }
+      catSelect.appendChild(opt);
+    }
+    const customOpt = document.createElement("option");
+    customOpt.value = "__custom__";
+    customOpt.textContent = "＋ 自訂分類…";
+    if (!foundCategory) customOpt.selected = true;
+    catSelect.appendChild(customOpt);
+    catGroup.appendChild(catSelect);
+    const catCustomInput = el("input") as HTMLInputElement;
+    catCustomInput.placeholder = "輸入自訂分類名稱";
+    catCustomInput.value = foundCategory ? "" : tpl.category;
+    catCustomInput.style.display = foundCategory ? "none" : "";
+    catCustomInput.style.marginTop = "6px";
+    catGroup.appendChild(catCustomInput);
+    catSelect.addEventListener("change", () => {
+      catCustomInput.style.display = catSelect.value === "__custom__" ? "" : "none";
+    });
     form.appendChild(catGroup);
 
     // Content
@@ -493,7 +540,7 @@ export class TemplateUI {
     saveBtn.textContent = "💾 儲存變更";
     saveBtn.addEventListener("click", () => {
       const name = nameInput.value.trim();
-      const cat = catInput.value.trim();
+      const cat = catSelect.value === "__custom__" ? catCustomInput.value.trim() : catSelect.value;
       const content = contentInput.value.trim();
       if (!name || !content) {
         showToast("請填寫模板名稱和內容", true);

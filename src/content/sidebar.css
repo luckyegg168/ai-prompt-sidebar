@@ -280,6 +280,8 @@
   margin-bottom: 16px;
   white-space: pre-wrap;
   line-height: 1.7;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .aps-form-group {
@@ -307,8 +309,23 @@
   transition: border-color var(--aps-transition);
 }
 
-.aps-form-group input:focus {
+.aps-form-group input:focus,
+.aps-form-group select:focus {
   border-color: var(--aps-accent);
+}
+
+.aps-form-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--aps-border);
+  border-radius: var(--aps-radius-sm);
+  background: var(--aps-bg-secondary);
+  color: var(--aps-text);
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color var(--aps-transition);
+  cursor: pointer;
 }
 
 /* ── Action Buttons ────────────────────────── */
