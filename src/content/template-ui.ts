@@ -19,6 +19,8 @@ export class TemplateUI {
   private adapter: PlatformAdapter | null;
   private selectedCategory = "all";
   private searchQuery = "";
+  private selectedTag = "";
+  private showFavoritesOnly = false;
   private state: ViewState = { view: "list" };
 
   // Callbacks
@@ -27,6 +29,7 @@ export class TemplateUI {
   onDeleteTemplate?: (id: string) => void;
   onExportTemplates?: () => void;
   onImportTemplates?: () => void;
+  onToggleFavorite?: (id: string, isFavorite: boolean) => void;
 
   constructor(
     container: HTMLElement,
@@ -79,6 +82,15 @@ export class TemplateUI {
     searchWrap.appendChild(searchInput);
     // Export/Import buttons
     const eiWrap = el("div", "aps-search-actions");
+
+    const favToggle = el("button", "aps-icon-btn" + (this.showFavoritesOnly ? " aps-fav-active" : "")) as HTMLButtonElement;
+    favToggle.textContent = "⭐";
+    favToggle.title = this.showFavoritesOnly ? "顯示全部" : "只顯示收藏";
+    favToggle.addEventListener("click", () => {
+      this.showFavoritesOnly = !this.showFavoritesOnly;
+      this.render();
+    });
+
     const exportBtn = el("button", "aps-icon-btn") as HTMLButtonElement;
     exportBtn.textContent = "📤";
     exportBtn.title = "匯出模板";
@@ -87,6 +99,7 @@ export class TemplateUI {
     importBtn.textContent = "📥";
     importBtn.title = "匯入模板";
     importBtn.addEventListener("click", () => this.onImportTemplates?.());
+    eiWrap.appendChild(favToggle);
     eiWrap.appendChild(exportBtn);
     eiWrap.appendChild(importBtn);
     searchWrap.appendChild(eiWrap);
@@ -100,6 +113,31 @@ export class TemplateUI {
       tabs.appendChild(this.makeTab(`${cat.icon} ${cat.name}`, cat.id));
     }
     this.container.appendChild(tabs);
+
+    // Tag filter chips
+    const availableTags = this.getAvailableTags();
+    if (availableTags.length > 0) {
+      const tagWrap = el("div", "aps-tag-filters");
+      if (this.selectedTag) {
+        const clearChip = el("button", "aps-tag-chip aps-tag-clear");
+        clearChip.textContent = "✕ 清除標籤";
+        clearChip.addEventListener("click", () => {
+          this.selectedTag = "";
+          this.render();
+        });
+        tagWrap.appendChild(clearChip);
+      }
+      for (const tag of availableTags) {
+        const chip = el("button", "aps-tag-chip" + (this.selectedTag === tag ? " active" : ""));
+        chip.textContent = tag;
+        chip.addEventListener("click", () => {
+          this.selectedTag = this.selectedTag === tag ? "" : tag;
+          this.render();
+        });
+        tagWrap.appendChild(chip);
+      }
+      this.container.appendChild(tagWrap);
+    }
 
     // Filtered templates
     const filtered = this.getFilteredTemplates();
@@ -131,13 +169,41 @@ export class TemplateUI {
   private makeCard(tpl: Template): HTMLElement {
     const card = el("div", "aps-template-card");
 
+    // Header row: name + favorite star
+    const headerRow = el("div", "aps-card-header");
     const name = el("div", "aps-card-name");
     name.textContent = tpl.name;
-    card.appendChild(name);
+    headerRow.appendChild(name);
+
+    const starBtn = el("button", "aps-star-btn" + (tpl.isFavorite ? " aps-starred" : ""));
+    starBtn.textContent = tpl.isFavorite ? "★" : "☆";
+    starBtn.title = tpl.isFavorite ? "取消收藏" : "加入收藏";
+    starBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.onToggleFavorite?.(tpl.id, !tpl.isFavorite);
+    });
+    headerRow.appendChild(starBtn);
+    card.appendChild(headerRow);
 
     const preview = el("div", "aps-card-preview");
     preview.textContent = tpl.content.slice(0, 120) + (tpl.content.length > 120 ? "…" : "");
     card.appendChild(preview);
+
+    // Tag pills (template tags, not variable tags)
+    if (tpl.tags && tpl.tags.length > 0) {
+      const tagRow = el("div", "aps-card-tag-pills");
+      for (const tag of tpl.tags.slice(0, 3)) {
+        const pill = el("span", "aps-tag-pill");
+        pill.textContent = tag;
+        tagRow.appendChild(pill);
+      }
+      if (tpl.tags.length > 3) {
+        const more = el("span", "aps-tag-pill aps-tag-more");
+        more.textContent = `+${tpl.tags.length - 3}`;
+        tagRow.appendChild(more);
+      }
+      card.appendChild(tagRow);
+    }
 
     if (tpl.variables.length > 0) {
       const tags = el("div", "aps-card-tags");
@@ -163,21 +229,47 @@ export class TemplateUI {
 
   private getFilteredTemplates(): Template[] {
     let list = this.templates;
+    if (this.showFavoritesOnly) {
+      list = list.filter((t) => t.isFavorite);
+    }
     if (this.selectedCategory !== "all") {
       list = list.filter((t) => {
         const cat = this.categories.find((c) => c.id === this.selectedCategory);
         return cat ? t.category === cat.name : true;
       });
     }
+    if (this.selectedTag) {
+      list = list.filter((t) => t.tags?.includes(this.selectedTag));
+    }
     if (this.searchQuery.trim()) {
       const q = this.searchQuery.toLowerCase();
       list = list.filter(
         (t) =>
           t.name.toLowerCase().includes(q) ||
-          t.content.toLowerCase().includes(q)
+          t.content.toLowerCase().includes(q) ||
+          (t.tags ?? []).some((tag) => tag.toLowerCase().includes(q))
       );
     }
-    return list;
+    // Favorites first
+    return [...list].sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
+  }
+
+  /** Collect unique tags from templates visible under current category filter */
+  private getAvailableTags(): string[] {
+    let list = this.templates;
+    if (this.selectedCategory !== "all") {
+      list = list.filter((t) => {
+        const cat = this.categories.find((c) => c.id === this.selectedCategory);
+        return cat ? t.category === cat.name : true;
+      });
+    }
+    const tagSet = new Set<string>();
+    for (const t of list) {
+      for (const tag of t.tags ?? []) {
+        tagSet.add(tag);
+      }
+    }
+    return [...tagSet].sort();
   }
 
   /* ─── Detail View ───────────────────── */

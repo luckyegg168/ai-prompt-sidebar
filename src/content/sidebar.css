@@ -471,3 +471,114 @@
   background: #422006;
   color: #fbbf24;
 }
+
+/* ── Tag Filter Chips ──────────────────────── */
+.aps-tag-filters {
+  display: flex;
+  gap: 4px;
+  padding: 6px 16px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.aps-tag-chip {
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--aps-border);
+  background: transparent;
+  color: var(--aps-text-secondary);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--aps-transition);
+}
+
+.aps-tag-chip:hover {
+  background: var(--aps-accent-light);
+  color: var(--aps-accent);
+}
+
+.aps-tag-chip.active {
+  background: var(--aps-accent);
+  color: #fff;
+  border-color: var(--aps-accent);
+}
+
+.aps-tag-clear {
+  color: var(--aps-danger);
+  border-color: var(--aps-danger);
+}
+
+.aps-tag-clear:hover {
+  background: var(--aps-danger);
+  color: #fff;
+}
+
+/* ── Card Header (name + star) ─────────────── */
+.aps-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.aps-star-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--aps-text-secondary);
+  padding: 0;
+  line-height: 1;
+  transition: color var(--aps-transition);
+  flex-shrink: 0;
+}
+
+.aps-star-btn:hover {
+  color: #eab308;
+}
+
+.aps-star-btn.aps-starred {
+  color: #eab308;
+}
+
+/* ── Tag Pills on Cards ────────────────────── */
+.aps-card-tag-pills {
+  margin-top: 6px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.aps-tag-pill {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 8px;
+  font-size: 10px;
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.aps-dark .aps-tag-pill {
+  background: #1e3a5f;
+  color: #93c5fd;
+}
+
+.aps-tag-more {
+  background: var(--aps-bg-secondary);
+  color: var(--aps-text-secondary);
+}
+
+/* ── Favorites active button ───────────────── */
+.aps-fav-active {
+  background: #fef3c7 !important;
+  color: #eab308 !important;
+  border-color: #eab308 !important;
+}
+
+.aps-dark .aps-fav-active {
+  background: #422006 !important;
+  color: #fbbf24 !important;
+  border-color: #fbbf24 !important;
+}

@@ -2,7 +2,9 @@
   "categories": [
     { "id": "stock-analysis", "name": "選股分析", "icon": "📈", "order": 1 },
     { "id": "financial-report", "name": "財報解讀", "icon": "📊", "order": 2 },
-    { "id": "industry-research", "name": "產業研究", "icon": "🏭", "order": 3 }
+    { "id": "industry-research", "name": "產業研究", "icon": "🏭", "order": 3 },
+    { "id": "image-generation", "name": "圖片生成", "icon": "🎨", "order": 4 },
+    { "id": "video-generation", "name": "影片生成", "icon": "🎬", "order": 5 }
   ],
   "templates": [
     {
@@ -49,6 +51,116 @@
       "name": "ETF 成分股分析",
       "category": "產業研究",
       "content": "請分析 {{ETF代號}} 的前十大成分股，說明各成分股的產業分布、權重、近期表現，並評估該 ETF 的投資價值。"
+    },
+
+    {
+      "name": "電影級場景",
+      "category": "圖片生成",
+      "content": "Generate a cinematic scene: {{場景描述}}. Style: {{風格}}, shot on 35mm film. Lighting: {{燈光}}. Camera angle: {{鏡頭角度}}. Color palette: {{色調}}. Ultra-detailed, 8K resolution, photorealistic.",
+      "tags": ["text-to-image", "cinematic"]
+    },
+    {
+      "name": "人物肖像",
+      "category": "圖片生成",
+      "content": "Create a {{風格}} portrait of {{人物描述}}. Expression: {{表情}}. Background: {{背景}}. Lighting: {{燈光}}. Art style: {{藝術風格}}. Highly detailed, professional quality.",
+      "tags": ["text-to-image", "portrait"]
+    },
+    {
+      "name": "產品展示圖",
+      "category": "圖片生成",
+      "content": "Professional product photography of {{產品描述}}. Background: {{背景}}. Lighting: studio softbox, {{補充燈光}}. Angle: {{拍攝角度}}. Style: clean, commercial, magazine-quality. High resolution.",
+      "tags": ["text-to-image", "product"]
+    },
+    {
+      "name": "Logo 與圖標設計",
+      "category": "圖片生成",
+      "content": "Design a modern {{類型}} logo for {{品牌名稱}}. Concept: {{概念描述}}. Style: {{風格}}. Colors: {{配色}}. Must be clean, scalable, and work on both light and dark backgrounds. Minimalist, vector-style.",
+      "tags": ["text-to-image", "logo", "design"]
+    },
+    {
+      "name": "建築視覺化",
+      "category": "圖片生成",
+      "content": "Architectural visualization: {{建築描述}}. Style: {{建築風格}}. Environment: {{環境}}. Time of day: {{時間}}. Materials: {{材質}}. Photorealistic rendering, award-winning architectural photography.",
+      "tags": ["text-to-image", "architecture"]
+    },
+    {
+      "name": "風格轉換",
+      "category": "圖片生成",
+      "content": "Transform this image into {{目標風格}} style. Keep the original composition and subject matter. Apply {{藝術家或流派}} aesthetic. Adjust color palette to {{色調}}. Maintain structural integrity while fully adopting the new artistic style.",
+      "tags": ["image-to-image", "style-transfer"]
+    },
+    {
+      "name": "角色一致性續圖",
+      "category": "圖片生成",
+      "content": "Generate the same character: {{角色描述}} (maintain exact appearance, clothing, and features). New scene: {{新場景}}. New pose: {{新姿勢}}. Same art style as reference. Ensure character consistency across images.",
+      "tags": ["image-to-image", "character-consistency"]
+    },
+    {
+      "name": "場景延伸",
+      "category": "圖片生成",
+      "content": "Expand this scene outward. The original image shows: {{原圖描述}}. Extend the scene to reveal: {{延伸方向與內容}}. Maintain consistent lighting, perspective, style, and color palette with the original.",
+      "tags": ["image-to-image", "outpainting"]
+    },
+    {
+      "name": "Prompt 增強器",
+      "category": "圖片生成",
+      "content": "我有一個簡單的圖片生成描述：「{{原始描述}}」。請幫我擴充為專業的 AI 圖片生成 prompt，包含：1) 主體細節描述 2) 環境與背景 3) 燈光設定 4) 鏡頭與構圖 5) 藝術風格 6) 品質關鍵字。輸出英文 prompt，可直接用於 Grok Imagine / Gemini 圖片生成。",
+      "tags": ["utility", "prompt-enhance"]
+    },
+    {
+      "name": "負面提示詞組合",
+      "category": "圖片生成",
+      "content": "Negative prompt for high-quality generation: blurry, low quality, distorted, deformed, disfigured, bad anatomy, wrong proportions, extra limbs, extra fingers, mutated hands, poorly drawn, watermark, signature, text, logo, cropped, out of frame, duplicate, ugly, morbid, mutation. {{額外排除項目}}",
+      "tags": ["utility", "negative-prompt"]
+    },
+
+    {
+      "name": "電影短片分鏡",
+      "category": "影片生成",
+      "content": "Create a cinematic storyboard for a {{時長}} short film about: {{主題}}.\n\nFor each shot provide:\n- Shot number and duration (seconds)\n- Camera movement (dolly/crane/tracking/static/handheld)\n- Framing (wide/medium/close-up/extreme close-up)\n- Scene description (action, subject, environment)\n- Lighting mood\n- Transition to next shot\n\nStyle reference: {{風格參考}}. Mood: {{氛圍}}. Aspect ratio: {{比例}}.",
+      "tags": ["text-to-video", "storyboard", "cinematic"]
+    },
+    {
+      "name": "產品廣告腳本",
+      "category": "影片生成",
+      "content": "Write a {{時長}} second product advertisement video script for {{產品名稱}}.\n\nProvide frame-by-frame description:\n- Seconds 0-3: Opening hook ({{開場方式}})\n- Each subsequent 3-5 second segment: camera angle, product showcase, motion, text overlay\n- Final 3 seconds: CTA and logo reveal\n\nTone: {{調性}}. Target audience: {{目標受眾}}. Key selling point: {{賣點}}.",
+      "tags": ["text-to-video", "advertisement", "product"]
+    },
+    {
+      "name": "動態 Logo Reveal",
+      "category": "影片生成",
+      "content": "Create a {{時長}} second logo reveal animation for {{品牌名稱}}.\n\nLogo description: {{Logo描述}}.\nAnimation style: {{動畫風格}}.\nBackground: {{背景}}.\nParticle/effect type: {{特效類型}}.\nCamera movement: start from {{起始}} smoothly transition to {{結束}}.\nSound design suggestion: {{音效建議}}.\nColor scheme: {{配色}}.",
+      "tags": ["text-to-video", "logo-reveal", "motion"]
+    },
+    {
+      "name": "靜態圖轉動態",
+      "category": "影片生成",
+      "content": "Animate this still image: {{圖片描述}}.\n\nAdd the following motion:\n- Camera: {{鏡頭運動}} (e.g., slow zoom in, pan left to right, parallax)\n- Element animation: {{元素動態}} (e.g., hair flowing, clouds moving, water rippling)\n- Duration: {{時長}} seconds\n- Loop: {{是否循環}}\n- Maintain the original art style and color palette.\n- Subtle, natural movement — avoid distortion.",
+      "tags": ["image-to-video", "animate-still"]
+    },
+    {
+      "name": "多圖過場動畫",
+      "category": "影片生成",
+      "content": "Create a {{總時長}} second video transitioning through {{圖片數量}} images.\n\nImage descriptions (in order):\n{{圖片描述清單}}\n\nTransition style between each: {{轉場效果}} (e.g., cross-dissolve, morph, whip pan, match cut).\nPacing: {{節奏}} (slow/medium/fast).\nBackground music suggestion: {{配樂風格}}.\nEach image holds for {{每張秒數}} seconds.\nOverall mood: {{整體氛圍}}.",
+      "tags": ["images-to-video", "slideshow", "transition"]
+    },
+    {
+      "name": "角色動態化",
+      "category": "影片生成",
+      "content": "Animate this character: {{角色描述}}.\n\nAction: {{動作描述}} (e.g., walking forward, turning head, waving, speaking).\nExpression change: {{表情變化}}.\nCamera angle: {{鏡頭角度}}.\nBackground: {{背景}} (static or also animated).\nDuration: {{時長}} seconds.\nStyle: maintain consistency with the reference image.\nSmooth motion, natural body mechanics.",
+      "tags": ["image-to-video", "character-animation"]
+    },
+    {
+      "name": "運鏡指令速查",
+      "category": "影片生成",
+      "content": "我需要以下運鏡效果的專業英文描述，可直接用於 AI 影片生成 prompt：\n\n運鏡類型：{{運鏡類型}}\n（可選：Dolly in/out, Crane shot, Tracking shot, Whip pan, Dutch angle, Steadicam, Handheld, Zoom, Rack focus, Tilt up/down, Aerial/drone, 360 orbit）\n\n請提供：\n1. 英文運鏡描述（2-3 句，含速度和方向）\n2. 適合的場景類型\n3. 營造的情緒效果\n4. 可搭配的轉場效果",
+      "tags": ["utility", "camera-movement", "reference"]
+    },
+    {
+      "name": "影片風格參考",
+      "category": "影片生成",
+      "content": "Generate a video in the style of {{風格參考}}.\n（可選：Wes Anderson 對稱構圖, Christopher Nolan 時間敘事, Wong Kar-wai 霓虹色調, Ridley Scott 科幻史詩, Ghibli 手繪動畫, Pixar 3D動畫, Cyberpunk 2077, Blade Runner, 北歐極簡）\n\nSubject: {{主題}}.\nApply the characteristic: color grading, framing, pacing, and atmosphere.\nDuration: {{時長}} seconds.\nAspect ratio: {{比例}}.",
+      "tags": ["utility", "style-reference", "cinematic"]
     }
   ]
 }

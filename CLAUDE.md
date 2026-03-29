@@ -2,7 +2,12 @@
 
 ## Project Overview
 
-Chrome 擴充工具：在 AI 聊天平台（Grok、Gemini）頁面注入浮動側邊欄，提供預設提示詞模板，支援一鍵填入並送出。主要用於金融分析場景：選股分析、財報解讀、產業研究。
+Chrome 擴充工具：在 AI 聊天平台（Grok、Gemini）頁面注入浮動側邊欄，提供預設提示詞模板，支援一鍵填入並送出。
+
+應用場景：
+- **金融分析** — 選股分析、財報解讀、產業研究
+- **AI 圖片生成** — Text to Image、Image to Image、風格轉換、Upscale
+- **AI 影片生成** — Text to Video、Images to Video、動態分鏡
 
 ## Tech Stack
 
@@ -70,7 +75,8 @@ interface Template {
   category: string;          // "選股分析" | "財報解讀" | "產業研究" | custom
   content: string;           // prompt body, supports {{variable}} syntax
   variables: Variable[];     // extracted from content
-  platform?: string;         // optional: lock to specific platform
+  platform?: string;         // optional: lock to specific platform (e.g. "Grok" for Imagine)
+  tags?: string[];           // optional: ["text-to-image", "cinematic", "portrait"]
   createdAt: number;
   updatedAt: number;
 }
@@ -83,7 +89,7 @@ interface Variable {
 
 interface Category {
   id: string;
-  name: string;              // "選股分析"
+  name: string;              // "選股分析" | "圖片生成" | "影片生成"
   icon: string;              // emoji or icon class
   order: number;
 }
@@ -141,6 +147,40 @@ Each adapter handles platform-specific DOM quirks:
 - **產業趨勢報告**: `請提供 {{產業名稱}} 的 2024-2025 年趨勢分析，包含：市場規模、成長驅動力、主要風險、受惠公司（台股），以及投資建議。`
 - **ETF 成分股分析**: `請分析 {{ETF代號}} 的前十大成分股，說明各成分股的產業分布、權重、近期表現，並評估該 ETF 的投資價值。`
 
+### Category: 圖片生成 (AI Image Generation)
+
+**Text to Image:**
+- **電影級場景**: 生成指定主題的電影風格場景圖（燈光、構圖、色調可控）
+- **人物肖像**: 指定風格的人物肖像（寫實/動漫/油畫/賽博龐克）
+- **產品展示圖**: 商業級產品攝影風格圖
+- **Logo 與圖標**: 品牌 Logo / App 圖標設計
+- **建築視覺化**: 建築外觀或室內設計概念圖
+
+**Image to Image:**
+- **風格轉換**: 將描述的畫面轉換為指定藝術風格
+- **角色一致性續圖**: 基於角色描述生成同一角色的不同場景/姿勢
+- **場景延伸**: 基於原圖描述向外擴展場景
+
+**Utility:**
+- **Upscale 增強描述**: 為模糊的 prompt 補充細節以提升生成品質
+- **負面提示詞組合**: 排除常見瑕疵的 negative prompt 模板
+
+### Category: 影片生成 (AI Video Generation)
+
+**Text to Video:**
+- **電影短片分鏡**: 根據主題產出完整分鏡描述（鏡頭、運鏡、時長）
+- **產品廣告腳本**: 15-30 秒產品廣告的逐幀描述
+- **動態 Logo Reveal**: 品牌 Logo 動態展示效果描述
+
+**Images to Video (Reference-based):**
+- **圖片轉動態**: 將靜態圖描述轉為動態場景（鏡頭平移、縮放、元素動態化）
+- **多圖過場**: 多張圖片的過場動畫描述（轉場效果、節奏、配樂建議）
+- **角色動態化**: 將角色圖轉為動作片段描述（走路、說話、表情變化）
+
+**Utility:**
+- **運鏡指令**: 專業攝影運鏡術語模板（Dolly、Crane、Tracking 等）
+- **影片風格參考**: 指定電影/導演風格的影片描述模板
+
 ## Build & Dev
 
 ```bash
@@ -175,3 +215,18 @@ npm run build
 - Sidebar z-index must be high enough to overlay platform UI but not block modals
 - Test on both light/dark mode for each platform
 - Variable extraction uses regex: `/\{\{([^}]+)\}\}/g`
+- Image/video generation templates use English prompts for best AI model compatibility, with Chinese UI labels and variable names
+- `tags` field on templates is optional, used for future filtering (e.g., show only "text-to-image" templates)
+- Grok Imagine and Gemini image generation use the same chat input — no separate adapter needed
+- Video generation prompts output structured storyboards/descriptions that users paste into video AI tools (Runway, Pika, Kling, etc.)
+
+## Template Categories Overview
+
+| Category | Count | Use Case |
+|----------|-------|----------|
+| 選股分析 | 3 | 個股基本面、技術面、同業比較 |
+| 財報解讀 | 3 | 季報摘要、現金流、紅旗偵測 |
+| 產業研究 | 3 | 產業鏈、趨勢、ETF |
+| 圖片生成 | 10 | Text-to-Image (5), Image-to-Image (3), Utility (2) |
+| 影片生成 | 8 | Text-to-Video (3), Image-to-Video (3), Utility (2) |
+| **Total** | **27** | |

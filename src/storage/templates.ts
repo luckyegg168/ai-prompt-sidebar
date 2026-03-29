@@ -79,7 +79,7 @@ export async function addTemplate(
 
 export async function updateTemplate(
   id: string,
-  partial: Partial<Pick<Template, "name" | "category" | "content" | "platform">>
+  partial: Partial<Pick<Template, "name" | "category" | "content" | "platform" | "tags" | "isFavorite">>
 ): Promise<Template | null> {
   const templates = await getTemplates();
   const idx = templates.findIndex((t) => t.id === id);

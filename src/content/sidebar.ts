@@ -42,6 +42,11 @@ import { TemplateUI, showToast } from "./template-ui";
   if (theme === "dark") sidebar.classList.add("aps-dark");
   if (!settings.autoShow) sidebar.classList.add("aps-hidden");
 
+  // Apply dynamic sidebar width
+  if (settings.sidebarWidth && settings.sidebarWidth !== 340) {
+    sidebar.style.setProperty("--aps-width", `${settings.sidebarWidth}px`);
+  }
+
   // Header
   const header = document.createElement("div");
   header.className = "aps-header";
@@ -113,6 +118,12 @@ import { TemplateUI, showToast } from "./template-ui";
     showToast("✅ 模板已更新");
   };
 
+  ui.onToggleFavorite = async (id, isFavorite) => {
+    await updateTemplate(id, { isFavorite });
+    const freshT = await getTemplates();
+    ui.setData(freshT, categories);
+  };
+
   ui.onExportTemplates = async () => {
     const t = await getTemplates();
     const c = await getCategories();
@@ -150,6 +161,7 @@ import { TemplateUI, showToast } from "./template-ui";
           content: String(t.content ?? ""),
           variables: extractVariables(String(t.content ?? "")),
           platform: t.platform ? String(t.platform) : undefined,
+          tags: Array.isArray(t.tags) ? t.tags.map(String) : undefined,
           createdAt: now,
           updatedAt: now,
         }));
@@ -211,10 +223,11 @@ import { TemplateUI, showToast } from "./template-ui";
       toggleSidebar();
     }
     if (msg.type === "SETTINGS_CHANGED") {
-      // Reload settings and reapply theme
+      // Reload settings and reapply theme + width
       getSettings().then((s) => {
         const newTheme = s.theme === "auto" ? adapter.getTheme() : s.theme;
         sidebar.classList.toggle("aps-dark", newTheme === "dark");
+        sidebar.style.setProperty("--aps-width", `${s.sidebarWidth}px`);
       });
     }
   });

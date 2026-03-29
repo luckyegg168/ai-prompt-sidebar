@@ -11,6 +11,8 @@ export interface Template {
   content: string;
   variables: Variable[];
   platform?: string;
+  tags?: string[];
+  isFavorite?: boolean;
   createdAt: number;
   updatedAt: number;
 }

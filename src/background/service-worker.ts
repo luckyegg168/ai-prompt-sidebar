@@ -12,6 +12,8 @@ chrome.runtime.onInstalled.addListener(() => {
       "https://x.com/i/grok*",
       "https://grok.com/*",
       "https://gemini.google.com/*",
+      "https://chatgpt.com/*",
+      "https://claude.ai/*",
     ],
   });
 });
