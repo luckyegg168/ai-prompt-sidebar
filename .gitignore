@@ -3,3 +3,11 @@ dist/
 *.map
 .DS_Store
 Thumbs.db
+coverage/
+*.log
+npm-debug.log*
+.vscode/
+.idea/
+.env
+.env.local
+ai-prompt-sidebar.zip

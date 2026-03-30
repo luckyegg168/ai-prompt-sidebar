@@ -10,7 +10,11 @@
     "outDir": "dist",
     "rootDir": "src",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["chrome"]
+    "types": ["chrome", "jest", "node"],
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

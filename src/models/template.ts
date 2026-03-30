@@ -24,6 +24,25 @@ export interface Category {
   order: number;
 }
 
+export interface TabGroup {
+  id: string;
+  name: string;
+  icon: string;
+  file: string;
+  order: number;
+}
+
+export interface DefaultsManifest {
+  files: string[];
+  tabGroups: TabGroup[];
+}
+
+export interface TemplateFile {
+  categories: Category[];
+  templates: Omit<Template, "id" | "createdAt" | "updatedAt">[];
+  defaultPrompts?: string[];
+}
+
 export interface Settings {
   sidebarWidth: number;
   autoShow: boolean;

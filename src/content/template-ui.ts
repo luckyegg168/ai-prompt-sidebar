@@ -1,10 +1,20 @@
-import { Template, Category, fillTemplate } from "../models/template";
-import { PlatformAdapter } from "../adapters/base";
+import { Template, Category, TabGroup, fillTemplate } from "../models/template";
+import { PlatformAdapter } from "../adapters";
 
 /**
  * Renders the template list view and the detail/variable-fill view.
- * All DOM is built manually (no framework).
+ * Supports top-level tab groups (選股分析 / 圖片生成 / 影片生成 / 其他工具)
+ * and sub-category tabs within each group.
  */
+
+/** Helper to create DOM elements */
+function el(tagName: string, className?: string): HTMLElement {
+  const element = document.createElement(tagName);
+  if (className) {
+    element.className = className;
+  }
+  return element;
+}
 
 type ViewState =
   | { view: "list" }
@@ -16,7 +26,10 @@ export class TemplateUI {
   private container: HTMLElement;
   private templates: Template[] = [];
   private categories: Category[] = [];
+  private tabGroups: TabGroup[] = [];
+  private defaultPrompts: Record<string, string[]> = {};
   private adapter: PlatformAdapter | null;
+  private activeTabGroup = "";
   private selectedCategory = "all";
   private searchQuery = "";
   private selectedTag = "";
@@ -26,23 +39,40 @@ export class TemplateUI {
 
   // Callbacks
   onAddTemplate?: (name: string, category: string, content: string) => void;
-  onUpdateTemplate?: (id: string, name: string, category: string, content: string) => void;
+  onUpdateTemplate?: (
+    id: string,
+    name: string,
+    category: string,
+    content: string
+  ) => void;
   onDeleteTemplate?: (id: string) => void;
   onExportTemplates?: () => void;
   onImportTemplates?: () => void;
   onToggleFavorite?: (id: string, isFavorite: boolean) => void;
 
-  constructor(
-    container: HTMLElement,
-    adapter: PlatformAdapter | null
-  ) {
+  constructor(container: HTMLElement, adapter: PlatformAdapter | null) {
     this.container = container;
     this.adapter = adapter;
   }
 
-  setData(templates: Template[], categories: Category[]): void {
+  setData(
+    templates: Template[],
+    categories: Category[],
+    tabGroups?: TabGroup[],
+    defaultPrompts?: Record<string, string[]>
+  ): void {
     this.templates = templates;
     this.categories = categories;
+    if (tabGroups && tabGroups.length > 0) {
+      this.tabGroups = tabGroups.sort((a, b) => a.order - b.order);
+    }
+    if (defaultPrompts) {
+      this.defaultPrompts = defaultPrompts;
+    }
+    // Set default active tab group if not set
+    if (!this.activeTabGroup && this.tabGroups.length > 0) {
+      this.activeTabGroup = this.tabGroups[0].id;
+    }
     this.render();
   }
 
@@ -69,8 +99,61 @@ export class TemplateUI {
     }
   }
 
+  /* ─── Get categories for active tab group ─── */
+  private getCategoriesForTabGroup(): Category[] {
+    if (!this.activeTabGroup || this.tabGroups.length === 0) {
+      return this.categories;
+    }
+    const tg = this.tabGroups.find((g) => g.id === this.activeTabGroup);
+    if (!tg) return this.categories;
+
+    // Map tab group to its category names
+    const catNames = this.getCategoryNamesForTabGroup(tg.id);
+    return this.categories.filter((c) => catNames.has(c.name));
+  }
+
+  /** Get category names belonging to a tab group based on file mapping */
+  private getCategoryNamesForTabGroup(tabGroupId: string): Set<string> {
+    const groupMap: Record<string, string[]> = {
+      stock: ["選股分析", "財報解讀", "產業研究"],
+      image: ["圖片生成"],
+      video: ["影片生成"],
+      general: ["寫作助手", "程式開發", "日常效率"],
+    };
+    return new Set(groupMap[tabGroupId] ?? []);
+  }
+
+  private getTemplatesForTabGroup(): Template[] {
+    if (!this.activeTabGroup || this.tabGroups.length === 0) {
+      return this.templates;
+    }
+    const catNames = this.getCategoryNamesForTabGroup(this.activeTabGroup);
+    return this.templates.filter((t) => catNames.has(t.category));
+  }
+
   /* ─── List View ─────────────────────── */
   private renderList(): void {
+    // ── Main Tab Groups (top-level navigation) ──
+    if (this.tabGroups.length > 0) {
+      const mainTabs = el("div", "aps-main-tabs");
+      for (const tg of this.tabGroups) {
+        const btn = el(
+          "button",
+          "aps-main-tab" + (this.activeTabGroup === tg.id ? " active" : "")
+        );
+        btn.innerHTML = `<span class="aps-main-tab-icon">${tg.icon}</span><span class="aps-main-tab-label">${tg.name}</span>`;
+        btn.addEventListener("click", () => {
+          this.activeTabGroup = tg.id;
+          this.selectedCategory = "all";
+          this.selectedTag = "";
+          this.searchQuery = "";
+          this.render();
+        });
+        mainTabs.appendChild(btn);
+      }
+      this.container.appendChild(mainTabs);
+    }
+
     // Search bar
     const searchWrap = el("div", "aps-search");
     const searchInput = el("input") as HTMLInputElement;
@@ -88,7 +171,10 @@ export class TemplateUI {
     // Export/Import buttons
     const eiWrap = el("div", "aps-search-actions");
 
-    const favToggle = el("button", "aps-icon-btn" + (this.showFavoritesOnly ? " aps-fav-active" : "")) as HTMLButtonElement;
+    const favToggle = el(
+      "button",
+      "aps-icon-btn" + (this.showFavoritesOnly ? " aps-fav-active" : "")
+    ) as HTMLButtonElement;
     favToggle.textContent = "⭐";
     favToggle.title = this.showFavoritesOnly ? "顯示全部" : "只顯示收藏";
     favToggle.addEventListener("click", () => {
@@ -110,19 +196,73 @@ export class TemplateUI {
     searchWrap.appendChild(eiWrap);
     this.container.appendChild(searchWrap);
 
-    // Category tabs with count badges
+    // Sub-category tabs (within active tab group)
+    const visibleCategories = this.getCategoriesForTabGroup();
+    const visibleTemplates = this.getTemplatesForTabGroup();
+
     const tabs = el("div", "aps-tabs");
-    const allCount = this.getCountForCategory("all");
-    const allTab = this.makeTab(`全部`, "all", allCount);
+    const allCount = this.getCountForCategory("all", visibleTemplates);
+    const allTab = this.makeTab("全部", "all", allCount);
     tabs.appendChild(allTab);
-    for (const cat of this.categories) {
-      const count = this.getCountForCategory(cat.id);
+    for (const cat of visibleCategories) {
+      const count = this.getCountForCategory(cat.id, visibleTemplates);
       tabs.appendChild(this.makeTab(`${cat.icon} ${cat.name}`, cat.id, count));
     }
     this.container.appendChild(tabs);
 
+    // Default prompts section (for image/video generation)
+    const prompts = this.defaultPrompts[this.activeTabGroup];
+    if (
+      prompts &&
+      prompts.length > 0 &&
+      this.selectedCategory === "all" &&
+      !this.searchQuery.trim()
+    ) {
+      const promptSection = el("div", "aps-default-prompts");
+      const promptSelect = el("select", "aps-form-select") as HTMLSelectElement;
+      promptSelect.style.marginBottom = "4px";
+      const defaultOpt = el("option") as HTMLOptionElement;
+      defaultOpt.textContent = "💡 選擇快速提示詞...";
+      defaultOpt.value = "";
+      promptSelect.appendChild(defaultOpt);
+
+      for (const prompt of prompts) {
+        const opt = el("option") as HTMLOptionElement;
+        opt.textContent =
+          prompt.length > 60 ? prompt.slice(0, 60) + "…" : prompt;
+        opt.value = prompt;
+        promptSelect.appendChild(opt);
+      }
+
+      promptSelect.addEventListener("change", () => {
+        const val = promptSelect.value;
+        if (!val) return;
+        promptSelect.value = ""; // Reset
+
+        const fakeTpl: Template = {
+          id: crypto.randomUUID(),
+          name: "自訂組合提示詞",
+          category: "快速提示詞",
+          content: "{{提示詞內容}}",
+          variables: [
+            {
+              name: "提示詞內容",
+              placeholder: "您可以由上方下拉選單繼續加入，或手動修改...",
+              defaultValue: val,
+            },
+          ],
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        this.state = { view: "detail", template: fakeTpl };
+        this.render();
+      });
+      promptSection.appendChild(promptSelect);
+      this.container.appendChild(promptSection);
+    }
+
     // Tag filter chips
-    const availableTags = this.getAvailableTags();
+    const availableTags = this.getAvailableTags(visibleTemplates);
     if (availableTags.length > 0) {
       const tagWrap = el("div", "aps-tag-filters");
       if (this.selectedTag) {
@@ -135,7 +275,10 @@ export class TemplateUI {
         tagWrap.appendChild(clearChip);
       }
       for (const tag of availableTags) {
-        const chip = el("button", "aps-tag-chip" + (this.selectedTag === tag ? " active" : ""));
+        const chip = el(
+          "button",
+          "aps-tag-chip" + (this.selectedTag === tag ? " active" : "")
+        );
         chip.textContent = tag;
         chip.addEventListener("click", () => {
           this.selectedTag = this.selectedTag === tag ? "" : tag;
@@ -147,14 +290,18 @@ export class TemplateUI {
     }
 
     // Filtered templates
-    const filtered = this.getFilteredTemplates();
+    const filtered = this.getFilteredTemplates(visibleTemplates);
 
     const list = el("div", "aps-list");
     if (filtered.length === 0) {
       const empty = el("div", "aps-empty");
       empty.innerHTML = `<div class="aps-empty-icon">📋</div><div>沒有符合的模板</div>`;
       list.appendChild(empty);
-    } else if (this.selectedCategory !== "all" && !this.selectedTag && !this.searchQuery.trim()) {
+    } else if (
+      this.selectedCategory !== "all" &&
+      !this.selectedTag &&
+      !this.searchQuery.trim()
+    ) {
       // Group by subcategory (tag) when viewing a specific category
       const groups = this.groupByTag(filtered);
       for (const group of groups) {
@@ -162,7 +309,10 @@ export class TemplateUI {
         const section = el("div", "aps-subcategory-section");
 
         const header = el("div", "aps-subcategory-header");
-        const arrow = el("span", "aps-subcategory-arrow" + (isCollapsed ? " collapsed" : ""));
+        const arrow = el(
+          "span",
+          "aps-subcategory-arrow" + (isCollapsed ? " collapsed" : "")
+        );
         arrow.textContent = "▾";
         header.appendChild(arrow);
         const headerLabel = el("span", "aps-subcategory-label");
@@ -200,7 +350,9 @@ export class TemplateUI {
   }
 
   /** Group templates by their first tag (subcategory) */
-  private groupByTag(templates: Template[]): { tag: string; templates: Template[] }[] {
+  private groupByTag(
+    templates: Template[]
+  ): { tag: string; templates: Template[] }[] {
     const map = new Map<string, Template[]>();
     for (const tpl of templates) {
       const tag = tpl.tags?.[0] ?? "其他";
@@ -215,8 +367,11 @@ export class TemplateUI {
   }
 
   /** Count templates for a given category (respecting favorites filter) */
-  private getCountForCategory(categoryId: string): number {
-    let list = this.templates;
+  private getCountForCategory(
+    categoryId: string,
+    baseList?: Template[]
+  ): number {
+    let list = baseList ?? this.getTemplatesForTabGroup();
     if (this.showFavoritesOnly) {
       list = list.filter((t) => t.isFavorite);
     }
@@ -227,7 +382,11 @@ export class TemplateUI {
     return list.length;
   }
 
-  private makeTab(label: string, categoryId: string, count?: number): HTMLButtonElement {
+  private makeTab(
+    label: string,
+    categoryId: string,
+    count?: number
+  ): HTMLButtonElement {
     const btn = el("button", "aps-tab") as HTMLButtonElement;
     if (count !== undefined) {
       const labelSpan = el("span");
@@ -257,7 +416,10 @@ export class TemplateUI {
     name.textContent = tpl.name;
     headerRow.appendChild(name);
 
-    const starBtn = el("button", "aps-star-btn" + (tpl.isFavorite ? " aps-starred" : ""));
+    const starBtn = el(
+      "button",
+      "aps-star-btn" + (tpl.isFavorite ? " aps-starred" : "")
+    );
     starBtn.textContent = tpl.isFavorite ? "★" : "☆";
     starBtn.title = tpl.isFavorite ? "取消收藏" : "加入收藏";
     starBtn.addEventListener("click", (e) => {
@@ -268,7 +430,8 @@ export class TemplateUI {
     card.appendChild(headerRow);
 
     const preview = el("div", "aps-card-preview");
-    preview.textContent = tpl.content.slice(0, 120) + (tpl.content.length > 120 ? "…" : "");
+    preview.textContent =
+      tpl.content.slice(0, 120) + (tpl.content.length > 120 ? "…" : "");
     card.appendChild(preview);
 
     // Tag pills (template tags, not variable tags)
@@ -309,8 +472,8 @@ export class TemplateUI {
     return card;
   }
 
-  private getFilteredTemplates(): Template[] {
-    let list = this.templates;
+  private getFilteredTemplates(baseList?: Template[]): Template[] {
+    let list = baseList ?? this.getTemplatesForTabGroup();
     if (this.showFavoritesOnly) {
       list = list.filter((t) => t.isFavorite);
     }
@@ -333,12 +496,14 @@ export class TemplateUI {
       );
     }
     // Favorites first
-    return [...list].sort((a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0));
+    return [...list].sort(
+      (a, b) => (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0)
+    );
   }
 
   /** Collect unique tags from templates visible under current category filter */
-  private getAvailableTags(): string[] {
-    let list = this.templates;
+  private getAvailableTags(baseList?: Template[]): string[] {
+    let list = baseList ?? this.getTemplatesForTabGroup();
     if (this.selectedCategory !== "all") {
       list = list.filter((t) => {
         const cat = this.categories.find((c) => c.id === this.selectedCategory);
@@ -376,6 +541,51 @@ export class TemplateUI {
 
     // Variable inputs
     const inputs: Record<string, HTMLInputElement> = {};
+    let focusedInput: HTMLInputElement | null = null;
+
+    // Quick prompt cross-combination
+    const prompts = this.defaultPrompts[this.activeTabGroup];
+    if (prompts && prompts.length > 0 && tpl.variables.length > 0) {
+      const promptSection = el("div", "aps-default-prompts");
+      promptSection.style.padding = "0 0 16px 0";
+      promptSection.style.borderBottom = "none";
+      promptSection.style.background = "transparent";
+
+      const promptSelect = el("select", "aps-form-select") as HTMLSelectElement;
+      const defaultOpt = el("option") as HTMLOptionElement;
+      defaultOpt.textContent = "💡 選擇快速提示詞加入到輸入框...";
+      defaultOpt.value = "";
+      promptSelect.appendChild(defaultOpt);
+
+      for (const prompt of prompts) {
+        const opt = el("option") as HTMLOptionElement;
+        opt.textContent =
+          prompt.length > 60 ? prompt.slice(0, 60) + "…" : prompt;
+        opt.value = prompt;
+        promptSelect.appendChild(opt);
+      }
+
+      promptSelect.addEventListener("change", () => {
+        const val = promptSelect.value;
+        if (!val) return;
+        promptSelect.value = ""; // Reset for next selection
+
+        const target = focusedInput || inputs[tpl.variables[0].name];
+        if (target) {
+          const defaultVal =
+            tpl.variables.find((v) => v.name === target.name)?.defaultValue ||
+            "";
+          if (!target.value.trim() || target.value === defaultVal) {
+            target.value = val;
+          } else {
+            target.value = target.value.trim() + ", " + val;
+          }
+        }
+      });
+      promptSection.appendChild(promptSelect);
+      detail.appendChild(promptSection);
+    }
+
     for (const v of tpl.variables) {
       const group = el("div", "aps-form-group");
       const label = el("label");
@@ -383,8 +593,15 @@ export class TemplateUI {
       group.appendChild(label);
 
       const input = el("input") as HTMLInputElement;
+      input.name = v.name; // Use name property to find variable default later
       input.placeholder = v.placeholder || `請輸入 ${v.name}`;
       input.value = v.defaultValue ?? "";
+
+      // Track focused input
+      input.addEventListener("focus", () => {
+        focusedInput = input;
+      });
+
       group.appendChild(input);
       detail.appendChild(group);
       inputs[v.name] = input;
@@ -395,14 +612,20 @@ export class TemplateUI {
     // Actions
     const actions = el("div", "aps-actions");
 
-    const fillBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    const fillBtn = el(
+      "button",
+      "aps-btn aps-btn-secondary"
+    ) as HTMLButtonElement;
     fillBtn.textContent = "📋 僅填入";
     fillBtn.addEventListener("click", () => {
       const values = this.collectValues(inputs);
       this.injectText(fillTemplate(tpl.content, values));
     });
 
-    const copyBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    const copyBtn = el(
+      "button",
+      "aps-btn aps-btn-secondary"
+    ) as HTMLButtonElement;
     copyBtn.textContent = "📄 複製";
     copyBtn.addEventListener("click", () => {
       const values = this.collectValues(inputs);
@@ -412,14 +635,20 @@ export class TemplateUI {
       });
     });
 
-    const sendBtn = el("button", "aps-btn aps-btn-primary") as HTMLButtonElement;
+    const sendBtn = el(
+      "button",
+      "aps-btn aps-btn-primary"
+    ) as HTMLButtonElement;
     sendBtn.textContent = "🚀 填入並送出";
     sendBtn.addEventListener("click", () => {
       const values = this.collectValues(inputs);
       this.injectAndSubmit(fillTemplate(tpl.content, values));
     });
 
-    const editBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    const editBtn = el(
+      "button",
+      "aps-btn aps-btn-secondary"
+    ) as HTMLButtonElement;
     editBtn.textContent = "✏️";
     editBtn.style.flex = "0";
     editBtn.style.padding = "10px 14px";
@@ -477,7 +706,7 @@ export class TemplateUI {
     // Category (dropdown + custom option)
     const catGroup = el("div", "aps-form-group");
     const catLabel = el("label");
-    catLabel.textContent = "��類";
+    catLabel.textContent = "分類";
     catGroup.appendChild(catLabel);
     const catSelect = document.createElement("select") as HTMLSelectElement;
     catSelect.className = "aps-form-select";
@@ -498,7 +727,8 @@ export class TemplateUI {
     catCustomInput.style.marginTop = "6px";
     catGroup.appendChild(catCustomInput);
     catSelect.addEventListener("change", () => {
-      catCustomInput.style.display = catSelect.value === "__custom__" ? "" : "none";
+      catCustomInput.style.display =
+        catSelect.value === "__custom__" ? "" : "none";
     });
     form.appendChild(catGroup);
 
@@ -517,11 +747,17 @@ export class TemplateUI {
 
     // Actions
     const actions = el("div", "aps-actions");
-    const saveBtn = el("button", "aps-btn aps-btn-primary") as HTMLButtonElement;
-    saveBtn.textContent = "💾 儲存模��";
+    const saveBtn = el(
+      "button",
+      "aps-btn aps-btn-primary"
+    ) as HTMLButtonElement;
+    saveBtn.textContent = "💾 儲存模板";
     saveBtn.addEventListener("click", () => {
       const name = nameInput.value.trim();
-      const cat = catSelect.value === "__custom__" ? catCustomInput.value.trim() : catSelect.value;
+      const cat =
+        catSelect.value === "__custom__"
+          ? catCustomInput.value.trim()
+          : catSelect.value;
       const content = contentInput.value.trim();
       if (!name || !content) {
         showToast("請填寫模板名稱和內容", true);
@@ -530,7 +766,10 @@ export class TemplateUI {
       this.onAddTemplate?.(name, cat || "自訂", content);
     });
 
-    const cancelBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    const cancelBtn = el(
+      "button",
+      "aps-btn aps-btn-secondary"
+    ) as HTMLButtonElement;
     cancelBtn.textContent = "取消";
     cancelBtn.addEventListener("click", () => this.goToList());
 
@@ -596,7 +835,8 @@ export class TemplateUI {
     catCustomInput.style.marginTop = "6px";
     catGroup.appendChild(catCustomInput);
     catSelect.addEventListener("change", () => {
-      catCustomInput.style.display = catSelect.value === "__custom__" ? "" : "none";
+      catCustomInput.style.display =
+        catSelect.value === "__custom__" ? "" : "none";
     });
     form.appendChild(catGroup);
 
@@ -614,11 +854,17 @@ export class TemplateUI {
 
     // Actions
     const actions = el("div", "aps-actions");
-    const saveBtn = el("button", "aps-btn aps-btn-primary") as HTMLButtonElement;
+    const saveBtn = el(
+      "button",
+      "aps-btn aps-btn-primary"
+    ) as HTMLButtonElement;
     saveBtn.textContent = "💾 儲存變更";
     saveBtn.addEventListener("click", () => {
       const name = nameInput.value.trim();
-      const cat = catSelect.value === "__custom__" ? catCustomInput.value.trim() : catSelect.value;
+      const cat =
+        catSelect.value === "__custom__"
+          ? catCustomInput.value.trim()
+          : catSelect.value;
       const content = contentInput.value.trim();
       if (!name || !content) {
         showToast("請填寫模板名稱和內容", true);
@@ -627,7 +873,10 @@ export class TemplateUI {
       this.onUpdateTemplate?.(tpl.id, name, cat || "自訂", content);
     });
 
-    const cancelBtn = el("button", "aps-btn aps-btn-secondary") as HTMLButtonElement;
+    const cancelBtn = el(
+      "button",
+      "aps-btn aps-btn-secondary"
+    ) as HTMLButtonElement;
     cancelBtn.textContent = "取消";
     cancelBtn.addEventListener("click", () => {
       this.state = { view: "detail", template: tpl };
@@ -640,7 +889,9 @@ export class TemplateUI {
   }
 
   /* ─── Helpers ────────────────────────── */
-  private collectValues(inputs: Record<string, HTMLInputElement>): Record<string, string> {
+  private collectValues(
+    inputs: Record<string, HTMLInputElement>
+  ): Record<string, string> {
     const values: Record<string, string> = {};
     for (const [key, input] of Object.entries(inputs)) {
       values[key] = input.value;
@@ -679,13 +930,6 @@ export class TemplateUI {
       showToast("🚀 已送出");
     }, 150);
   }
-}
-
-/* ─── DOM Utility ──────────────────────────── */
-function el(tag: string, className?: string): HTMLElement {
-  const e = document.createElement(tag);
-  if (className) e.className = className;
-  return e;
 }
 
 export function showToast(message: string, isError = false): void {

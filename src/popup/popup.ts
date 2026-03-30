@@ -1,9 +1,18 @@
-import { getSettings, saveSettings, saveTemplates, saveCategories } from "../storage/templates";
+import {
+  getSettings,
+  saveSettings,
+  saveTemplates,
+  saveCategories,
+} from "../storage/templates";
 import { DEFAULT_SETTINGS } from "../models/template";
 
-const themeSelect = document.getElementById("theme-select") as HTMLSelectElement;
+const themeSelect = document.getElementById(
+  "theme-select"
+) as HTMLSelectElement;
 const autoShowCb = document.getElementById("auto-show") as HTMLInputElement;
-const widthSlider = document.getElementById("sidebar-width") as HTMLInputElement;
+const widthSlider = document.getElementById(
+  "sidebar-width"
+) as HTMLInputElement;
 const widthValue = document.getElementById("width-value") as HTMLSpanElement;
 const toggleBtn = document.getElementById("toggle-btn") as HTMLButtonElement;
 const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
@@ -20,7 +29,10 @@ const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
 // Theme change
 themeSelect.addEventListener("change", async () => {
   const settings = await getSettings();
-  const updated = { ...settings, theme: themeSelect.value as "auto" | "light" | "dark" };
+  const updated = {
+    ...settings,
+    theme: themeSelect.value as "auto" | "light" | "dark",
+  };
   await saveSettings(updated);
   notifyContentScript("SETTINGS_CHANGED");
 });

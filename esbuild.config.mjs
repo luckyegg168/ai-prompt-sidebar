@@ -12,6 +12,8 @@ const commonOptions = {
   format: "iife",
   sourcemap: true,
   minify: !isWatch,
+  // External chrome API for esbuild bundling
+  external: [],
 };
 
 async function build() {
@@ -59,6 +61,22 @@ async function build() {
   copyFileSync(
     resolve(__dirname, "templates/defaults.json"),
     resolve(distDir, "defaults.json")
+  );
+  copyFileSync(
+    resolve(__dirname, "templates/stock-analysis.json"),
+    resolve(distDir, "stock-analysis.json")
+  );
+  copyFileSync(
+    resolve(__dirname, "templates/image-generation.json"),
+    resolve(distDir, "image-generation.json")
+  );
+  copyFileSync(
+    resolve(__dirname, "templates/video-generation.json"),
+    resolve(distDir, "video-generation.json")
+  );
+  copyFileSync(
+    resolve(__dirname, "templates/general.json"),
+    resolve(distDir, "general.json")
   );
 
   // Copy icons

@@ -1,0 +1,155 @@
+{
+  "categories": [
+    {
+      "id": "video-generation",
+      "name": "影片生成",
+      "icon": "🎬",
+      "order": 1
+    }
+  ],
+  "defaultPrompts": [
+    "a woman walking through a field of sunflowers, golden hour, cinematic slow motion",
+    "a man running through rain-soaked city streets at night, reflections on wet pavement",
+    "a dog catching a frisbee in a park, slow motion capture, joyful energy",
+    "a cat stretching and yawning on a sunlit windowsill, cozy afternoon vibes",
+    "a child blowing dandelion seeds into the wind, backlit by warm sunset light",
+    "an eagle soaring over snow-capped mountains, aerial cinematic shot",
+    "a couple dancing in the rain under city lights, romantic atmosphere",
+    "a surfer riding a massive wave, underwater and above water split shot",
+    "a ballerina performing a pirouette, dramatic stage lighting, slow motion",
+    "a chef preparing sushi with precise knife cuts, close-up macro shot",
+    "a sports car drifting around a mountain curve, dust and motion blur",
+    "a timelapse of a flower blooming, from bud to full bloom, macro lens",
+    "a drone shot flying through a narrow canyon at sunrise, epic landscape",
+    "a robot walking through a futuristic city, rain and neon reflections",
+    "a group of friends laughing around a campfire under starry sky, warm tones",
+    "ocean waves crashing against lighthouse during a dramatic storm, cinematic",
+    "a martial artist performing kung fu forms in a bamboo forest, flowing movement",
+    "a hot air balloon rising over Cappadocia at dawn, magical golden light",
+    "a woman painting on a large canvas, paint splashing in slow motion, artistic",
+    "fireworks exploding over a city skyline reflected in water, celebration mood"
+  ],
+  "templates": [
+    {
+      "name": "電影短片分鏡",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\nCreate a cinematic storyboard for a {{時長}} short film about: {{主題}}.\n\nFor each shot provide:\n- Shot number and duration (seconds)\n- Camera movement (dolly/crane/tracking/static/handheld)\n- Framing (wide/medium/close-up/extreme close-up)\n- Scene description (action, subject, environment)\n- Lighting mood\n- Transition to next shot\n\nStyle reference: {{風格參考}}. Mood: {{氛圍}}. Aspect ratio: {{比例}}.",
+      "tags": ["text-to-video", "storyboard", "cinematic"],
+      "variables": [
+        { "name": "時長", "placeholder": "例如：60 second", "defaultValue": "60 second" },
+        { "name": "主題", "placeholder": "例如：太空探索", "defaultValue": "a lone astronaut discovering alien ruins on Mars" },
+        { "name": "風格參考", "placeholder": "例如：Interstellar", "defaultValue": "Interstellar meets Blade Runner" },
+        { "name": "氛圍", "placeholder": "例如：mysterious", "defaultValue": "mysterious and awe-inspiring" },
+        { "name": "比例", "placeholder": "例如：16:9", "defaultValue": "16:9" }
+      ]
+    },
+    {
+      "name": "產品廣告腳本",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\nWrite a {{時長}} second product advertisement video script for {{產品名稱}}.\n\nProvide frame-by-frame description:\n- Seconds 0-3: Opening hook ({{開場方式}})\n- Each subsequent 3-5 second segment: camera angle, product showcase, motion, text overlay\n- Final 3 seconds: CTA and logo reveal\n\nTone: {{調性}}. Target audience: {{目標受眾}}. Key selling point: {{賣點}}.",
+      "tags": ["text-to-video", "advertisement", "product"],
+      "variables": [
+        { "name": "時長", "placeholder": "例如：30", "defaultValue": "30" },
+        { "name": "產品名稱", "placeholder": "例如：無線耳機", "defaultValue": "高階降噪無線耳機" },
+        { "name": "開場方式", "placeholder": "例如：dramatic reveal", "defaultValue": "dramatic slow-motion reveal from darkness" },
+        { "name": "調性", "placeholder": "例如：premium", "defaultValue": "premium, sophisticated" },
+        { "name": "目標受眾", "placeholder": "例如：年輕專業人士", "defaultValue": "25-40歲都會專業人士" },
+        { "name": "賣點", "placeholder": "例如：極致降噪", "defaultValue": "業界最強降噪，沉浸式音質" }
+      ]
+    },
+    {
+      "name": "動態 Logo Reveal",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\nCreate a {{時長}} second logo reveal animation for {{品牌名稱}}.\n\nLogo description: {{Logo描述}}.\nAnimation style: {{動畫風格}}.\nBackground: {{背景}}.\nParticle/effect type: {{特效類型}}.\nCamera movement: start from {{起始}} smoothly transition to {{結束}}.\nSound design suggestion: {{音效建議}}.\nColor scheme: {{配色}}.",
+      "tags": ["text-to-video", "logo-reveal", "motion"],
+      "variables": [
+        { "name": "時長", "placeholder": "例如：5", "defaultValue": "5" },
+        { "name": "品牌名稱", "placeholder": "例如：NexaTech", "defaultValue": "NexaTech" },
+        { "name": "Logo描述", "placeholder": "描述你的 Logo", "defaultValue": "geometric N letter mark in gradient blue" },
+        { "name": "動畫風格", "placeholder": "例如：particle assembly", "defaultValue": "particles assembling into logo" },
+        { "name": "背景", "placeholder": "例如：dark gradient", "defaultValue": "deep dark gradient with subtle stars" },
+        { "name": "特效類型", "placeholder": "例如：光粒子", "defaultValue": "glowing light particles and lens flare" },
+        { "name": "起始", "placeholder": "例如：wide", "defaultValue": "wide establishing shot" },
+        { "name": "結束", "placeholder": "例如：medium close-up", "defaultValue": "medium close-up centered on logo" },
+        { "name": "音效建議", "placeholder": "例如：deep bass hit", "defaultValue": "ethereal whoosh building to deep bass hit" },
+        { "name": "配色", "placeholder": "例如：brand colors", "defaultValue": "electric blue to white gradient" }
+      ]
+    },
+    {
+      "name": "靜態圖轉動態",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\nAnimate this still image: {{圖片描述}}.\n\nAdd the following motion:\n- Camera: {{鏡頭運動}} (e.g., slow zoom in, pan left to right, parallax)\n- Element animation: {{元素動態}} (e.g., hair flowing, clouds moving, water rippling)\n- Duration: {{時長}} seconds\n- Loop: {{是否循環}}\n- Maintain the original art style and color palette.\n- Subtle, natural movement — avoid distortion.",
+      "tags": ["image-to-video", "animate-still"],
+      "variables": [
+        { "name": "圖片描述", "placeholder": "描述圖片內容", "defaultValue": "a girl standing on a cliff overlooking the ocean at sunset" },
+        { "name": "鏡頭運動", "placeholder": "例如：slow zoom in", "defaultValue": "slow push in with subtle parallax" },
+        { "name": "元素動態", "placeholder": "例如：hair flowing", "defaultValue": "hair and dress flowing in the wind, waves crashing below" },
+        { "name": "時長", "placeholder": "例如：5", "defaultValue": "5" },
+        { "name": "是否循環", "placeholder": "yes / no", "defaultValue": "yes" }
+      ]
+    },
+    {
+      "name": "多圖過場動畫",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\nCreate a {{總時長}} second video transitioning through {{圖片數量}} images.\n\nImage descriptions (in order):\n{{圖片描述清單}}\n\nTransition style between each: {{轉場效果}}.\nPacing: {{節奏}}.\nBackground music suggestion: {{配樂風格}}.\nEach image holds for {{每張秒數}} seconds.\nOverall mood: {{整體氛圍}}.",
+      "tags": ["images-to-video", "slideshow", "transition"],
+      "variables": [
+        { "name": "總時長", "placeholder": "例如：30", "defaultValue": "30" },
+        { "name": "圖片數量", "placeholder": "例如：5", "defaultValue": "5" },
+        { "name": "圖片描述清單", "placeholder": "描述各張圖片", "defaultValue": "1. Sunrise over mountains\n2. Coffee shop morning\n3. City street at noon\n4. Golden hour park\n5. City skyline at night" },
+        { "name": "轉場效果", "placeholder": "例如：morph", "defaultValue": "smooth morph transition" },
+        { "name": "節奏", "placeholder": "slow/medium/fast", "defaultValue": "medium" },
+        { "name": "配樂風格", "placeholder": "例如：lo-fi", "defaultValue": "chill lo-fi beats" },
+        { "name": "每張秒數", "placeholder": "例如：5", "defaultValue": "5" },
+        { "name": "整體氛圍", "placeholder": "例如：peaceful", "defaultValue": "peaceful daily journey" }
+      ]
+    },
+    {
+      "name": "角色動態化",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\nAnimate this character: {{角色描述}}.\n\nAction: {{動作描述}}.\nExpression change: {{表情變化}}.\nCamera angle: {{鏡頭角度}}.\nBackground: {{背景}} (static or also animated).\nDuration: {{時長}} seconds.\nStyle: maintain consistency with the reference image.\nSmooth motion, natural body mechanics.",
+      "tags": ["image-to-video", "character-animation"],
+      "variables": [
+        { "name": "角色描述", "placeholder": "描述角色外觀", "defaultValue": "anime girl with blue hair in school uniform" },
+        { "name": "動作描述", "placeholder": "例如：walking", "defaultValue": "turning head to camera and waving with a smile" },
+        { "name": "表情變化", "placeholder": "例如：neutral to smile", "defaultValue": "neutral to warm, genuine smile" },
+        { "name": "鏡頭角度", "placeholder": "例如：medium shot", "defaultValue": "medium close-up, slight low angle" },
+        { "name": "背景", "placeholder": "例如：classroom", "defaultValue": "cherry blossom trees, petals falling (animated)" },
+        { "name": "時長", "placeholder": "例如：4", "defaultValue": "4" }
+      ]
+    },
+    {
+      "name": "運鏡指令速查",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\n我需要以下運鏡效果的專業英文描述，可直接用於 AI 影片生成 prompt：\n\n運鏡類型：{{運鏡類型}}\n（可選：Dolly in/out, Crane shot, Tracking shot, Whip pan, Dutch angle, Steadicam, Handheld, Zoom, Rack focus, Tilt up/down, Aerial/drone, 360 orbit）\n\n請提供：\n1. 英文運鏡描述（2-3 句，含速度和方向）\n2. 適合的場景類型\n3. 營造的情緒效果\n4. 可搭配的轉場效果",
+      "tags": ["utility", "camera-movement", "reference"],
+      "variables": [
+        { "name": "運鏡類型", "placeholder": "例如：Dolly in", "defaultValue": "Dolly in" }
+      ]
+    },
+    {
+      "name": "影片風格參考",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\nGenerate a video in the style of {{風格參考}}.\n\nSubject: {{主題}}.\nApply the characteristic: color grading, framing, pacing, and atmosphere.\nDuration: {{時長}} seconds.\nAspect ratio: {{比例}}.",
+      "tags": ["utility", "style-reference", "cinematic"],
+      "variables": [
+        { "name": "風格參考", "placeholder": "例如：Wes Anderson", "defaultValue": "Wes Anderson symmetrical" },
+        { "name": "主題", "placeholder": "例如：a hotel lobby", "defaultValue": "a whimsical hotel lobby with eccentric guests" },
+        { "name": "時長", "placeholder": "例如：10", "defaultValue": "10" },
+        { "name": "比例", "placeholder": "例如：16:9", "defaultValue": "16:9 widescreen" }
+      ]
+    },
+    {
+      "name": "社群短影音腳本",
+      "category": "影片生成",
+      "content": "你是一位專家 act like an expert.\n\n請幫我撰寫一則 {{平台}} 短影音腳本：\n\n主題：{{主題}}\n時長：{{時長}}秒\n風格：{{風格}}\n\n請提供：\n1. Hook（前3秒吸睛開場）\n2. 主要內容分段（每段3-5秒的畫面描述）\n3. 字幕/文字覆蓋建議\n4. 配樂與音效建議\n5. CTA（行動呼籲）\n6. Hashtag 建議",
+      "tags": ["text-to-video", "social-media", "short-form"],
+      "variables": [
+        { "name": "平台", "placeholder": "TikTok / IG Reels / YT Shorts", "defaultValue": "TikTok" },
+        { "name": "主題", "placeholder": "例如：一日咖啡師", "defaultValue": "一日咖啡師挑戰" },
+        { "name": "時長", "placeholder": "例如：30", "defaultValue": "30" },
+        { "name": "風格", "placeholder": "例如：輕鬆搞笑", "defaultValue": "輕鬆搞笑、快節奏" }
+      ]
+    }
+  ]
+}

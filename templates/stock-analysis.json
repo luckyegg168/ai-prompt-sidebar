@@ -1,0 +1,180 @@
+{
+  "categories": [
+    {
+      "id": "stock-analysis",
+      "name": "選股分析",
+      "icon": "📈",
+      "order": 1
+    },
+    {
+      "id": "financial-report",
+      "name": "財報解讀",
+      "icon": "📊",
+      "order": 2
+    },
+    {
+      "id": "industry-research",
+      "name": "產業研究",
+      "icon": "🏭",
+      "order": 3
+    }
+  ],
+  "templates": [
+    {
+      "name": "個股基本面分析",
+      "category": "選股分析",
+      "content": "你是一位專家 act like an expert.\n\n請分析 {{股票代號}} ({{股票名稱}}) 的基本面，包含：近四季 EPS、本益比、股價淨值比、殖利率、營收年增率。給出投資建議與風險提示。",
+      "tags": ["基本面", "個股"],
+      "variables": [
+        { "name": "股票代號", "placeholder": "例如：2330", "defaultValue": "2330" },
+        { "name": "股票名稱", "placeholder": "例如：台積電", "defaultValue": "台積電" }
+      ]
+    },
+    {
+      "name": "技術面快速掃描",
+      "category": "選股分析",
+      "content": "你是一位專家 act like an expert.\n\n請用技術分析觀點分析 {{股票代號}}，包含：目前均線排列（5/10/20/60 日線）、KD 與 RSI 指標、近期成交量變化、支撐與壓力價位。",
+      "tags": ["技術面", "個股"],
+      "variables": [
+        { "name": "股票代號", "placeholder": "例如：2330", "defaultValue": "2330" }
+      ]
+    },
+    {
+      "name": "同業比較",
+      "category": "選股分析",
+      "content": "你是一位專家 act like an expert.\n\n請比較 {{股票代號列表}} 這幾檔同業股票，從營收成長率、毛利率、本益比、殖利率等維度做表格比較，並指出各自優劣勢。",
+      "tags": ["基本面", "比較"],
+      "variables": [
+        { "name": "股票代號列表", "placeholder": "例如：2330, 2454, 3711", "defaultValue": "2330, 2454, 3711" }
+      ]
+    },
+    {
+      "name": "高殖利率選股",
+      "category": "選股分析",
+      "content": "你是一位專家 act like an expert.\n\n請列出台股中符合以下條件的高殖利率股票：\n1. 近五年平均殖利率 > {{最低殖利率}}%\n2. 近三年EPS穩定成長\n3. 負債比 < {{最高負債比}}%\n4. 股價淨值比 < {{最高PB}}倍\n\n請列出至少10檔，並附上各項數據。",
+      "tags": ["選股策略", "殖利率"],
+      "variables": [
+        { "name": "最低殖利率", "placeholder": "例如：5", "defaultValue": "5" },
+        { "name": "最高負債比", "placeholder": "例如：50", "defaultValue": "50" },
+        { "name": "最高PB", "placeholder": "例如：2", "defaultValue": "2" }
+      ]
+    },
+    {
+      "name": "成長股篩選",
+      "category": "選股分析",
+      "content": "你是一位專家 act like an expert.\n\n請篩選台股中的成長股，條件：\n1. 近四季營收年增率 > {{最低營收成長}}%\n2. 近四季EPS年增率 > {{最低EPS成長}}%\n3. 毛利率 > {{最低毛利率}}%\n4. 所屬產業：{{產業別}}\n\n列出符合條件的股票，並分析成長動能是否可持續。",
+      "tags": ["選股策略", "成長股"],
+      "variables": [
+        { "name": "最低營收成長", "placeholder": "例如：20", "defaultValue": "20" },
+        { "name": "最低EPS成長", "placeholder": "例如：15", "defaultValue": "15" },
+        { "name": "最低毛利率", "placeholder": "例如：30", "defaultValue": "30" },
+        { "name": "產業別", "placeholder": "例如：半導體", "defaultValue": "半導體" }
+      ]
+    },
+    {
+      "name": "法人籌碼分析",
+      "category": "選股分析",
+      "content": "你是一位專家 act like an expert.\n\n請分析 {{股票代號}} 近 {{天數}} 個交易日的法人籌碼動向：\n1. 外資買賣超統計\n2. 投信買賣超統計\n3. 自營商買賣超統計\n4. 融資融券變化\n5. 大戶持股比例變化\n\n判斷籌碼面是偏多還是偏空，並說明理由。",
+      "tags": ["籌碼面", "個股"],
+      "variables": [
+        { "name": "股票代號", "placeholder": "例如：2330", "defaultValue": "2330" },
+        { "name": "天數", "placeholder": "例如：20", "defaultValue": "20" }
+      ]
+    },
+    {
+      "name": "季報快速摘要",
+      "category": "財報解讀",
+      "content": "你是一位專家 act like an expert.\n\n請解讀 {{公司名稱}} {{年度}}Q{{季度}} 財報重點，包含：營收、毛利率、營業利益率、EPS 與去年同期比較，並指出值得注意的異常項目。",
+      "tags": ["季報", "摘要"],
+      "variables": [
+        { "name": "公司名稱", "placeholder": "例如：台積電", "defaultValue": "台積電" },
+        { "name": "年度", "placeholder": "例如：2024", "defaultValue": "2024" },
+        { "name": "季度", "placeholder": "例如：3", "defaultValue": "3" }
+      ]
+    },
+    {
+      "name": "現金流量分析",
+      "category": "財報解讀",
+      "content": "你是一位專家 act like an expert.\n\n請分析 {{公司名稱}} 最近四季的現金流量表，說明營業、投資、籌資活動現金流的變化趨勢，判斷公司的資金健康度。",
+      "tags": ["現金流", "財務健康"],
+      "variables": [
+        { "name": "公司名稱", "placeholder": "例如：台積電", "defaultValue": "台積電" }
+      ]
+    },
+    {
+      "name": "財報紅旗偵測",
+      "category": "財報解讀",
+      "content": "你是一位專家 act like an expert.\n\n請檢查 {{公司名稱}} 最新財報是否有以下紅旗：應收帳款異常增加、存貨週轉天數拉長、負債比率飆升、業外損益佔比過高、現金流與獲利背離。",
+      "tags": ["風險", "紅旗"],
+      "variables": [
+        { "name": "公司名稱", "placeholder": "例如：鴻海", "defaultValue": "鴻海" }
+      ]
+    },
+    {
+      "name": "三大報表綜合解讀",
+      "category": "財報解讀",
+      "content": "你是一位專家 act like an expert.\n\n請綜合分析 {{公司名稱}} {{年度}} 年度的三大財務報表（損益表、資產負債表、現金流量表），包含：\n1. 營收與獲利趨勢（毛利率、營業利益率、淨利率）\n2. 資產品質（流動比率、速動比率、存貨週轉）\n3. 負債結構（負債比率、利息保障倍數）\n4. 現金流品質（自由現金流、營業現金流/淨利 比率）\n5. ROE 杜邦分析\n\n給出整體評價與投資建議。",
+      "tags": ["綜合分析", "三大報表"],
+      "variables": [
+        { "name": "公司名稱", "placeholder": "例如：聯發科", "defaultValue": "聯發科" },
+        { "name": "年度", "placeholder": "例如：2024", "defaultValue": "2024" }
+      ]
+    },
+    {
+      "name": "股利政策分析",
+      "category": "財報解讀",
+      "content": "你是一位專家 act like an expert.\n\n請分析 {{公司名稱}} 過去 {{年數}} 年的股利政策：\n1. 現金股利與股票股利歷史\n2. 配息率趨勢\n3. 殖利率變化\n4. 與同業股利政策比較\n5. 股利發放的穩定性與成長性\n\n判斷該公司是否為穩定的存股標的。",
+      "tags": ["股利", "存股"],
+      "variables": [
+        { "name": "公司名稱", "placeholder": "例如：中華電信", "defaultValue": "中華電信" },
+        { "name": "年數", "placeholder": "例如：10", "defaultValue": "10" }
+      ]
+    },
+    {
+      "name": "產業鏈分析",
+      "category": "產業研究",
+      "content": "你是一位專家 act like an expert.\n\n請分析 {{產業名稱}} 的上中下游產業鏈結構，列出各環節的代表性公司（台股為主），並說明目前產業景氣位階。",
+      "tags": ["產業鏈", "結構"],
+      "variables": [
+        { "name": "產業名稱", "placeholder": "例如：半導體", "defaultValue": "半導體" }
+      ]
+    },
+    {
+      "name": "產業趨勢報告",
+      "category": "產業研究",
+      "content": "你是一位專家 act like an expert.\n\n請提供 {{產業名稱}} 的 2024-2025 年趨勢分析，包含：市場規模、成長驅動力、主要風險、受惠公司（台股），以及投資建議。",
+      "tags": ["趨勢", "展望"],
+      "variables": [
+        { "name": "產業名稱", "placeholder": "例如：AI 伺服器", "defaultValue": "AI 伺服器" }
+      ]
+    },
+    {
+      "name": "ETF 成分股分析",
+      "category": "產業研究",
+      "content": "你是一位專家 act like an expert.\n\n請分析 {{ETF代號}} 的前十大成分股，說明各成分股的產業分布、權重、近期表現，並評估該 ETF 的投資價值。",
+      "tags": ["ETF", "成分股"],
+      "variables": [
+        { "name": "ETF代號", "placeholder": "例如：0050", "defaultValue": "0050" }
+      ]
+    },
+    {
+      "name": "全球總經與台股影響",
+      "category": "產業研究",
+      "content": "你是一位專家 act like an expert.\n\n請分析目前全球總體經濟情勢對台股的影響：\n1. {{國家或地區}} 的貨幣政策走向（升/降息預期）\n2. 通膨數據趨勢\n3. 匯率（美元/台幣）影響\n4. 地緣政治風險\n5. 供應鏈變化\n\n對台股 {{產業別}} 類股的短中長期影響與建議。",
+      "tags": ["總經", "全球"],
+      "variables": [
+        { "name": "國家或地區", "placeholder": "例如：美國", "defaultValue": "美國" },
+        { "name": "產業別", "placeholder": "例如：科技", "defaultValue": "科技" }
+      ]
+    },
+    {
+      "name": "新興產業機會評估",
+      "category": "產業研究",
+      "content": "你是一位專家 act like an expert.\n\n請評估 {{新興領域}} 在台灣的投資機會：\n1. 技術發展階段與成熟度\n2. 台灣相關供應鏈公司\n3. 國際競爭對手分析\n4. 政府政策支持度\n5. 市場規模預估（2025-2030）\n6. 風險因素\n7. 推薦關注個股\n\n請提供具體數據支持。",
+      "tags": ["新興產業", "機會"],
+      "variables": [
+        { "name": "新興領域", "placeholder": "例如：低軌衛星", "defaultValue": "低軌衛星" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,595 @@
+{
+  "templates": [
+    {
+      "name": "部落格文章撰寫",
+      "category": "寫作助手",
+      "content": "你是一位專家 act like an expert.\n\n請幫我撰寫一篇 {{字數}} 字的部落格文章：\n\n主題：{{主題}}\n目標讀者：{{目標讀者}}\n語氣：{{語氣}}\n\n請包含：\n1. 吸引人的標題（3個選項）\n2. 引言段落\n3. {{段落數}} 個主要段落（每段一個子重點）\n4. 總結與行動呼籲\n5. SEO 關鍵字建議（5-8個）",
+      "tags": [
+        "blog",
+        "SEO",
+        "content"
+      ],
+      "variables": [
+        {
+          "name": "字數",
+          "placeholder": "例如：1500",
+          "defaultValue": "1500"
+        },
+        {
+          "name": "主題",
+          "placeholder": "例如：遠端工作技巧",
+          "defaultValue": "2025年遠端工作提升效率的10個技巧"
+        },
+        {
+          "name": "目標讀者",
+          "placeholder": "例如：上班族",
+          "defaultValue": "25-40歲跨國公司上班族"
+        },
+        {
+          "name": "語氣",
+          "placeholder": "例如：專業但親切",
+          "defaultValue": "專業但親切，像朋友分享"
+        },
+        {
+          "name": "段落數",
+          "placeholder": "例如：5",
+          "defaultValue": "5"
+        }
+      ]
+    },
+    {
+      "name": "社群媒體貼文",
+      "category": "寫作助手",
+      "content": "你是一位專家 act like an expert.\n\n請幫我撰寫 {{平台}} 貼文：\n\n主題：{{主題}}\n目的：{{目的}}\n語氣：{{語氣}}\n\n請提供：\n1. 貼文正文（含 emoji）\n2. 3-5 個替代版本（不同角度/語氣）\n3. Hashtag 組合（通用 + 利基各5個）\n4. 最佳發文時間建議\n5. 互動問句建議",
+      "tags": [
+        "social-media",
+        "copywriting"
+      ],
+      "variables": [
+        {
+          "name": "平台",
+          "placeholder": "Facebook / IG / X / LinkedIn",
+          "defaultValue": "Instagram"
+        },
+        {
+          "name": "主題",
+          "placeholder": "例如：新品上市",
+          "defaultValue": "手工咖啡新品上市"
+        },
+        {
+          "name": "目的",
+          "placeholder": "例如：品牌曝光",
+          "defaultValue": "新品推廣與互動"
+        },
+        {
+          "name": "語氣",
+          "placeholder": "例如：活潑年輕",
+          "defaultValue": "活潑年輕、引發好奇"
+        }
+      ]
+    },
+    {
+      "name": "Email 商業信件",
+      "category": "寫作助手",
+      "content": "你是一位專家 act like an expert.\n\n請幫我撰寫一封 {{類型}} 的商業Email：\n\n收件人：{{收件對象}}\n主題：{{信件主題}}\n語言：{{語言}}\n語氣：{{語氣}}\n\n需包含：\n1. 專業的主旨行\n2. 適當的稱謂與開場\n3. 清楚的正文\n4. 行動項目或下一步\n5. 專業的結尾",
+      "tags": [
+        "email",
+        "business"
+      ],
+      "variables": [
+        {
+          "name": "類型",
+          "placeholder": "例如：提案/跟進/感謝",
+          "defaultValue": "合作提案"
+        },
+        {
+          "name": "收件對象",
+          "placeholder": "例如：客戶行銷主管",
+          "defaultValue": "潛在合作夥伴的業務負責人"
+        },
+        {
+          "name": "信件主題",
+          "placeholder": "例如：Q4行銷合作",
+          "defaultValue": "AI工具導入合作方案"
+        },
+        {
+          "name": "語言",
+          "placeholder": "中文/英文",
+          "defaultValue": "中文"
+        },
+        {
+          "name": "語氣",
+          "placeholder": "例如：正式但友善",
+          "defaultValue": "正式專業、友善但不卑不亢"
+        }
+      ]
+    },
+    {
+      "name": "文章摘要與改寫",
+      "category": "寫作助手",
+      "content": "你是一位專家 act like an expert.\n\n請對以下內容進行 {{操作類型}}：\n\n原文：\n{{原始文章}}\n\n要求：\n- 目標長度：{{目標長度}}\n- 語氣：{{目標語氣}}\n- 重點保留：{{保留重點}}\n\n如果是摘要，請提供：\n1. 一句話摘要\n2. 三點式重點摘要\n3. 完整段落摘要",
+      "tags": [
+        "summary",
+        "rewrite"
+      ],
+      "variables": [
+        {
+          "name": "操作類型",
+          "placeholder": "摘要/改寫/精簡/擴充",
+          "defaultValue": "摘要"
+        },
+        {
+          "name": "原始文章",
+          "placeholder": "貼上原文...",
+          "defaultValue": ""
+        },
+        {
+          "name": "目標長度",
+          "placeholder": "例如：300字/原文的30%",
+          "defaultValue": "原文的30%"
+        },
+        {
+          "name": "目標語氣",
+          "placeholder": "例如：學術/口語/商業",
+          "defaultValue": "專業商業"
+        },
+        {
+          "name": "保留重點",
+          "placeholder": "例如：數據、結論",
+          "defaultValue": "關鍵數據與結論"
+        }
+      ]
+    },
+    {
+      "name": "翻譯與在地化",
+      "category": "寫作助手",
+      "content": "你是一位專家 act like an expert.\n\n請將以下內容從 {{來源語言}} 翻譯成 {{目標語言}}：\n\n原文：\n{{原文內容}}\n\n要求：\n- 翻譯風格：{{翻譯風格}}\n- 專業領域：{{領域}}\n- 保留格式：是\n- 提供翻譯說明（有文化差異或難以直譯之處）",
+      "tags": [
+        "translation",
+        "localization"
+      ],
+      "variables": [
+        {
+          "name": "來源語言",
+          "placeholder": "例如：英文",
+          "defaultValue": "英文"
+        },
+        {
+          "name": "目標語言",
+          "placeholder": "例如：繁體中文",
+          "defaultValue": "繁體中文（台灣用語）"
+        },
+        {
+          "name": "原文內容",
+          "placeholder": "貼上原文...",
+          "defaultValue": ""
+        },
+        {
+          "name": "翻譯風格",
+          "placeholder": "直譯/意譯/口語化",
+          "defaultValue": "流暢意譯"
+        },
+        {
+          "name": "領域",
+          "placeholder": "例如：科技/醫學/法律",
+          "defaultValue": "科技"
+        }
+      ]
+    },
+    {
+      "name": "YouTube 影片文案",
+      "category": "寫作助手",
+      "content": "你是一位專家 act like an expert.\n\n請幫我撰寫 YouTube 影片的完整文案：\n\n影片主題：{{主題}}\n影片時長：{{時長}}分鐘\n頻道風格：{{風格}}\n目標觀眾：{{目標觀眾}}\n\n請提供：\n1. 影片標題（SEO優化，3個選項）\n2. 縮圖文字建議\n3. 影片描述（含時間戳記）\n4. 影片腳本大綱（含開場Hook、各段落內容、結尾CTA）\n5. Tags（15-20個）\n6. 置頂留言建議",
+      "tags": [
+        "youtube",
+        "script",
+        "SEO"
+      ],
+      "variables": [
+        {
+          "name": "主題",
+          "placeholder": "例如：AI工具教學",
+          "defaultValue": "2025年必學的5個AI工具"
+        },
+        {
+          "name": "時長",
+          "placeholder": "例如：10",
+          "defaultValue": "10"
+        },
+        {
+          "name": "風格",
+          "placeholder": "例如：教學型/vlog",
+          "defaultValue": "知識型教學，輕鬆講解"
+        },
+        {
+          "name": "目標觀眾",
+          "placeholder": "例如：科技愛好者",
+          "defaultValue": "對AI有興趣的一般上班族"
+        }
+      ]
+    },
+    {
+      "name": "程式碼審查",
+      "category": "程式開發",
+      "content": "你是一位專家 act like an expert.\n\n請審查以下 {{程式語言}} 程式碼：\n\n```{{程式語言}}\n{{程式碼}}\n```\n\n請從以下面向提供回饋：\n1. 🐛 Bug / 潛在錯誤\n2. 🔒 安全性問題\n3. ⚡ 效能優化建議\n4. 📖 可讀性與命名\n5. 🏗️ 架構與設計模式\n6. ✅ 測試建議\n\n每個問題請說明嚴重等級（Critical/High/Medium/Low）並提供修正建議。",
+      "tags": [
+        "code-review",
+        "quality"
+      ],
+      "variables": [
+        {
+          "name": "程式語言",
+          "placeholder": "例如：TypeScript",
+          "defaultValue": "TypeScript"
+        },
+        {
+          "name": "程式碼",
+          "placeholder": "貼上程式碼...",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "name": "從需求到程式碼",
+      "category": "程式開發",
+      "content": "你是一位專家 act like an expert.\n\n請根據以下需求，用 {{程式語言}} 實作：\n\n需求描述：{{需求描述}}\n技術限制/框架：{{技術框架}}\n\n請提供：\n1. 解決方案設計（簡要架構說明）\n2. 完整可執行的程式碼\n3. 關鍵邏輯解釋\n4. 錯誤處理\n5. 使用範例\n6. 單元測試（至少3個案例）",
+      "tags": [
+        "implementation",
+        "coding"
+      ],
+      "variables": [
+        {
+          "name": "程式語言",
+          "placeholder": "例如：Python",
+          "defaultValue": "Python"
+        },
+        {
+          "name": "需求描述",
+          "placeholder": "描述功能需求",
+          "defaultValue": ""
+        },
+        {
+          "name": "技術框架",
+          "placeholder": "例如：FastAPI + PostgreSQL",
+          "defaultValue": "無特殊限制"
+        }
+      ]
+    },
+    {
+      "name": "Bug 除錯助手",
+      "category": "程式開發",
+      "content": "你是一位專家 act like an expert.\n\n我遇到以下程式錯誤，請幫我除錯：\n\n程式語言：{{程式語言}}\n錯誤訊息：\n```\n{{錯誤訊息}}\n```\n\n相關程式碼：\n```{{程式語言}}\n{{程式碼}}\n```\n\n我已嘗試：{{已嘗試}}\n\n請：\n1. 分析錯誤根本原因\n2. 提供修正後的程式碼\n3. 解釋為什麼這樣修正\n4. 建議如何避免類似問題",
+      "tags": [
+        "debug",
+        "troubleshoot"
+      ],
+      "variables": [
+        {
+          "name": "程式語言",
+          "placeholder": "例如：JavaScript",
+          "defaultValue": "JavaScript"
+        },
+        {
+          "name": "錯誤訊息",
+          "placeholder": "貼上錯誤訊息...",
+          "defaultValue": ""
+        },
+        {
+          "name": "程式碼",
+          "placeholder": "貼上相關程式碼...",
+          "defaultValue": ""
+        },
+        {
+          "name": "已嘗試",
+          "placeholder": "描述你已嘗試的方法",
+          "defaultValue": "Google搜尋和閱讀文件"
+        }
+      ]
+    },
+    {
+      "name": "SQL 查詢生成器",
+      "category": "程式開發",
+      "content": "你是一位專家 act like an expert.\n\n請根據以下需求生成 {{資料庫類型}} SQL 查詢：\n\n需求：{{查詢需求}}\n\n表結構：\n{{表結構}}\n\n請提供：\n1. 最佳化的 SQL 查詢\n2. 查詢邏輯解釋\n3. 建議的索引（如需要）\n4. 效能考量\n5. 替代寫法（如有）",
+      "tags": [
+        "SQL",
+        "database"
+      ],
+      "variables": [
+        {
+          "name": "資料庫類型",
+          "placeholder": "PostgreSQL/MySQL/SQLite",
+          "defaultValue": "PostgreSQL"
+        },
+        {
+          "name": "查詢需求",
+          "placeholder": "例如：找出每月營收前10的產品",
+          "defaultValue": ""
+        },
+        {
+          "name": "表結構",
+          "placeholder": "描述相關表的結構",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "name": "API 設計",
+      "category": "程式開發",
+      "content": "你是一位專家 act like an expert.\n\n請為以下功能設計 RESTful API：\n\n功能描述：{{功能描述}}\n技術架構：{{技術架構}}\n認證方式：{{認證方式}}\n\n請提供：\n1. API 端點清單（method, path, description）\n2. 請求/回應 JSON Schema\n3. 錯誤碼定義\n4. 認證與授權流程\n5. Rate Limiting 建議\n6. OpenAPI/Swagger 規格（YAML）",
+      "tags": [
+        "API",
+        "REST",
+        "design"
+      ],
+      "variables": [
+        {
+          "name": "功能描述",
+          "placeholder": "例如：用戶管理系統",
+          "defaultValue": ""
+        },
+        {
+          "name": "技術架構",
+          "placeholder": "例如：Node.js + Express",
+          "defaultValue": "Node.js + Express + PostgreSQL"
+        },
+        {
+          "name": "認證方式",
+          "placeholder": "例如：JWT",
+          "defaultValue": "JWT Bearer Token"
+        }
+      ]
+    },
+    {
+      "name": "正則表達式生成",
+      "category": "程式開發",
+      "content": "你是一位專家 act like an expert.\n\n請幫我寫一個正則表達式：\n\n用途：{{用途描述}}\n程式語言：{{程式語言}}\n\n需要匹配的範例：\n{{匹配範例}}\n\n不應匹配的範例：\n{{排除範例}}\n\n請提供：\n1. 正則表達式\n2. 逐段解釋\n3. 邊界情況說明\n4. 測試程式碼",
+      "tags": [
+        "regex",
+        "utility"
+      ],
+      "variables": [
+        {
+          "name": "用途描述",
+          "placeholder": "例如：驗證台灣手機號碼",
+          "defaultValue": "驗證台灣手機號碼（09開頭10位數）"
+        },
+        {
+          "name": "程式語言",
+          "placeholder": "例如：JavaScript",
+          "defaultValue": "JavaScript"
+        },
+        {
+          "name": "匹配範例",
+          "placeholder": "列出應匹配的字串",
+          "defaultValue": "0912345678, 0912-345-678"
+        },
+        {
+          "name": "排除範例",
+          "placeholder": "列出不應匹配的字串",
+          "defaultValue": "1234567890, 091234567"
+        }
+      ]
+    },
+    {
+      "name": "會議紀錄整理",
+      "category": "日常效率",
+      "content": "你是一位專家 act like an expert.\n\n請幫我整理以下會議內容為結構化紀錄：\n\n會議資訊：\n- 會議名稱：{{會議名稱}}\n- 日期：{{日期}}\n- 參與者：{{參與者}}\n\n會議內容/逐字稿：\n{{會議內容}}\n\n請整理為：\n1. 📋 會議摘要（3句話）\n2. 📌 關鍵決議\n3. ✅ 待辦事項（負責人 + 截止日）\n4. 💡 重要討論點\n5. ❓ 待確認事項\n6. 📅 下次會議建議議程",
+      "tags": [
+        "meeting",
+        "notes"
+      ],
+      "variables": [
+        {
+          "name": "會議名稱",
+          "placeholder": "例如：Q4 營運會議",
+          "defaultValue": ""
+        },
+        {
+          "name": "日期",
+          "placeholder": "例如：2025/01/15",
+          "defaultValue": ""
+        },
+        {
+          "name": "參與者",
+          "placeholder": "例如：Alice, Bob, Charlie",
+          "defaultValue": ""
+        },
+        {
+          "name": "會議內容",
+          "placeholder": "貼上會議內容或逐字稿...",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "name": "學習計劃制定",
+      "category": "日常效率",
+      "content": "你是一位專家 act like an expert.\n\n請幫我制定一個 {{學習主題}} 的學習計劃：\n\n目前程度：{{目前程度}}\n目標：{{學習目標}}\n每天可用時間：{{每日時間}}小時\n預計期間：{{學習期間}}\n\n請提供：\n1. 學習路線圖（分階段）\n2. 每週具體任務清單\n3. 推薦資源（書籍/課程/工具）\n4. 檢核點與評估方式\n5. 常見學習陷阱與建議",
+      "tags": [
+        "learning",
+        "plan"
+      ],
+      "variables": [
+        {
+          "name": "學習主題",
+          "placeholder": "例如：Python 程式設計",
+          "defaultValue": "Python 程式設計"
+        },
+        {
+          "name": "目前程度",
+          "placeholder": "例如：完全初學者",
+          "defaultValue": "有基礎程式概念，但沒寫過Python"
+        },
+        {
+          "name": "學習目標",
+          "placeholder": "例如：能寫爬蟲和自動化腳本",
+          "defaultValue": "能獨立開發 Web API 和資料分析腳本"
+        },
+        {
+          "name": "每日時間",
+          "placeholder": "例如：2",
+          "defaultValue": "2"
+        },
+        {
+          "name": "學習期間",
+          "placeholder": "例如：3個月",
+          "defaultValue": "3個月"
+        }
+      ]
+    },
+    {
+      "name": "旅行規劃助手",
+      "category": "日常效率",
+      "content": "你是一位專家 act like an expert.\n\n請幫我規劃 {{目的地}} 的旅行行程：\n\n旅行日期：{{日期範圍}}\n天數：{{天數}}天\n人數：{{人數}}人\n預算：{{預算}}\n偏好：{{偏好}}\n\n請提供：\n1. 每日行程表（含交通方式與時間）\n2. 必吃美食推薦\n3. 住宿建議（含價位）\n4. 預算分配表\n5. 行前準備清單\n6. 注意事項",
+      "tags": [
+        "travel",
+        "planning"
+      ],
+      "variables": [
+        {
+          "name": "目的地",
+          "placeholder": "例如：東京",
+          "defaultValue": "東京"
+        },
+        {
+          "name": "日期範圍",
+          "placeholder": "例如：2025/03/01-03/05",
+          "defaultValue": "2025/03/01-03/05"
+        },
+        {
+          "name": "天數",
+          "placeholder": "例如：5",
+          "defaultValue": "5"
+        },
+        {
+          "name": "人數",
+          "placeholder": "例如：2",
+          "defaultValue": "2"
+        },
+        {
+          "name": "預算",
+          "placeholder": "例如：每人5萬台幣",
+          "defaultValue": "每人5萬台幣（不含機票）"
+        },
+        {
+          "name": "偏好",
+          "placeholder": "例如：美食、文化",
+          "defaultValue": "美食控、喜歡逛街與文化體驗"
+        }
+      ]
+    },
+    {
+      "name": "面試準備",
+      "category": "日常效率",
+      "content": "你是一位專家 act like an expert.\n\n請幫我準備 {{職位}} 的面試：\n\n公司/產業：{{公司或產業}}\n經驗程度：{{經驗年數}}\n\n請提供：\n1. 常見面試問題（10題）與建議回答框架\n2. 行為面試 STAR 範例\n3. 技術面試準備重點\n4. 該向面試官提的好問題（5個）\n5. 自我介紹模板（30秒/1分鐘/3分鐘各一版）\n6. 薪資談判建議",
+      "tags": [
+        "interview",
+        "career"
+      ],
+      "variables": [
+        {
+          "name": "職位",
+          "placeholder": "例如：前端工程師",
+          "defaultValue": "前端工程師"
+        },
+        {
+          "name": "公司或產業",
+          "placeholder": "例如：科技新創",
+          "defaultValue": "科技新創公司"
+        },
+        {
+          "name": "經驗年數",
+          "placeholder": "例如：3年",
+          "defaultValue": "3年"
+        }
+      ]
+    },
+    {
+      "name": "健康飲食規劃",
+      "category": "日常效率",
+      "content": "你是一位專家 act like an expert.\n\n請根據以下條件幫我設計 {{天數}} 天的飲食計劃：\n\n基本資料：{{性別}}、{{年齡}}歲、{{身高}}cm、{{體重}}kg\n目標：{{飲食目標}}\n飲食限制：{{飲食限制}}\n\n請提供：\n1. 每日營養素目標（熱量/蛋白質/碳水/脂肪）\n2. 每日三餐+點心的菜單\n3. 簡易食譜（10分鐘內可完成的優先）\n4. 採買清單\n5. 外食替代方案",
+      "tags": [
+        "health",
+        "diet"
+      ],
+      "variables": [
+        {
+          "name": "天數",
+          "placeholder": "例如：7",
+          "defaultValue": "7"
+        },
+        {
+          "name": "性別",
+          "placeholder": "男/女",
+          "defaultValue": "男"
+        },
+        {
+          "name": "年齡",
+          "placeholder": "例如：30",
+          "defaultValue": "30"
+        },
+        {
+          "name": "身高",
+          "placeholder": "例如：175",
+          "defaultValue": "175"
+        },
+        {
+          "name": "體重",
+          "placeholder": "例如：75",
+          "defaultValue": "75"
+        },
+        {
+          "name": "飲食目標",
+          "placeholder": "例如：減脂",
+          "defaultValue": "減脂增肌"
+        },
+        {
+          "name": "飲食限制",
+          "placeholder": "例如：不吃牛肉",
+          "defaultValue": "無特殊限制"
+        }
+      ]
+    },
+    {
+      "name": "SWOT 分析",
+      "category": "日常效率",
+      "content": "你是一位專家 act like an expert.\n\n請對以下主題進行 SWOT 分析：\n\n分析對象：{{分析對象}}\n背景說明：{{背景}}\n\n請提供：\n1. Strengths（優勢）— 至少5點\n2. Weaknesses（劣勢）— 至少5點\n3. Opportunities（機會）— 至少5點\n4. Threats（威脅）— 至少5點\n5. SO 策略（優勢 × 機會）\n6. ST 策略（優勢 × 威脅）\n7. WO 策略（劣勢 × 機會）\n8. WT 策略（劣勢 × 威脅）\n9. 總結建議",
+      "tags": [
+        "analysis",
+        "strategy"
+      ],
+      "variables": [
+        {
+          "name": "分析對象",
+          "placeholder": "例如：我的咖啡店/某公司/某專案",
+          "defaultValue": ""
+        },
+        {
+          "name": "背景",
+          "placeholder": "提供相關背景資訊",
+          "defaultValue": ""
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "writing-assistant",
+      "name": "寫作助手",
+      "icon": "✍️",
+      "order": 6
+    },
+    {
+      "id": "coding-assistant",
+      "name": "程式開發",
+      "icon": "💻",
+      "order": 7
+    },
+    {
+      "id": "daily-productivity",
+      "name": "日常效率",
+      "icon": "⚡",
+      "order": 8
+    }
+  ]
+}

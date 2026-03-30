@@ -1,0 +1,188 @@
+{
+  "categories": [
+    {
+      "id": "image-generation",
+      "name": "圖片生成",
+      "icon": "🎨",
+      "order": 1
+    }
+  ],
+  "defaultPrompts": [
+    "a woman standing in a sunlit garden, wearing a white summer dress, soft natural light",
+    "a man in a leather jacket walking down a rainy city street at night, neon reflections",
+    "a golden retriever running on the beach at sunset, waves splashing",
+    "a cat sitting on a windowsill watching the rain, cozy warm interior",
+    "a child holding a red balloon in a field of wildflowers, dreamy atmosphere",
+    "an elderly couple sitting on a park bench, autumn leaves falling around them",
+    "a woman with flowing red hair standing on a cliff overlooking the ocean",
+    "a man reading a book in a cozy coffee shop, steam rising from his cup",
+    "a white horse galloping through a misty forest, ethereal morning light",
+    "a girl in a kimono walking through a cherry blossom garden, petals falling",
+    "a cyberpunk cityscape at night with flying cars and holographic billboards",
+    "a medieval castle on a mountaintop surrounded by clouds and eagles",
+    "an underwater scene with colorful coral reef and tropical fish",
+    "a cozy cabin in a snowy forest with warm light glowing from windows",
+    "a futuristic space station orbiting Earth, stars in the background",
+    "a street food vendor in a bustling Asian night market, steam and lanterns",
+    "a ballerina dancing on stage under a single spotlight, dramatic shadows",
+    "a samurai standing in a bamboo forest, wind blowing through the leaves",
+    "a dragon flying over a volcanic landscape, fire and smoke in the sky",
+    "a robot and a child walking hand in hand through a flower meadow"
+  ],
+  "templates": [
+    {
+      "name": "電影級場景",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nGenerate a cinematic scene: {{場景描述}}. Style: {{風格}}, shot on 35mm film. Lighting: {{燈光}}. Camera angle: {{鏡頭角度}}. Color palette: {{色調}}. Ultra-detailed, 8K resolution, photorealistic.",
+      "tags": ["text-to-image", "cinematic"],
+      "variables": [
+        { "name": "場景描述", "placeholder": "例如：cyberpunk city at night", "defaultValue": "a futuristic cyberpunk city at night with neon lights" },
+        { "name": "風格", "placeholder": "例如：Blade Runner", "defaultValue": "Blade Runner neo-noir" },
+        { "name": "燈光", "placeholder": "例如：neon glow", "defaultValue": "dramatic neon glow with volumetric fog" },
+        { "name": "鏡頭角度", "placeholder": "例如：low angle", "defaultValue": "low angle looking up" },
+        { "name": "色調", "placeholder": "例如：blue and purple", "defaultValue": "deep blue and electric purple" }
+      ]
+    },
+    {
+      "name": "人物肖像",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nCreate a {{風格}} portrait of {{人物描述}}. Expression: {{表情}}. Background: {{背景}}. Lighting: {{燈光}}. Art style: {{藝術風格}}. Highly detailed, professional quality.",
+      "tags": ["text-to-image", "portrait"],
+      "variables": [
+        { "name": "風格", "placeholder": "例如：realistic", "defaultValue": "photorealistic" },
+        { "name": "人物描述", "placeholder": "例如：a young woman", "defaultValue": "a young woman with flowing dark hair" },
+        { "name": "表情", "placeholder": "例如：serene smile", "defaultValue": "serene, confident smile" },
+        { "name": "背景", "placeholder": "例如：blurred garden", "defaultValue": "soft bokeh garden" },
+        { "name": "燈光", "placeholder": "例如：golden hour", "defaultValue": "golden hour natural light" },
+        { "name": "藝術風格", "placeholder": "例如：oil painting", "defaultValue": "digital art with oil painting texture" }
+      ]
+    },
+    {
+      "name": "產品展示圖",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nProfessional product photography of {{產品描述}}. Background: {{背景}}. Lighting: studio softbox, {{補充燈光}}. Angle: {{拍攝角度}}. Style: clean, commercial, magazine-quality. High resolution.",
+      "tags": ["text-to-image", "product"],
+      "variables": [
+        { "name": "產品描述", "placeholder": "例如：a sleek smartphone", "defaultValue": "a sleek black smartphone" },
+        { "name": "背景", "placeholder": "例如：gradient white", "defaultValue": "clean gradient white to light gray" },
+        { "name": "補充燈光", "placeholder": "例如：rim light", "defaultValue": "subtle rim light highlighting edges" },
+        { "name": "拍攝角度", "placeholder": "例如：45 degree", "defaultValue": "45 degree hero angle" }
+      ]
+    },
+    {
+      "name": "Logo 與圖標設計",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nDesign a modern {{類型}} logo for {{品牌名稱}}. Concept: {{概念描述}}. Style: {{風格}}. Colors: {{配色}}. Must be clean, scalable, and work on both light and dark backgrounds. Minimalist, vector-style.",
+      "tags": ["text-to-image", "logo", "design"],
+      "variables": [
+        { "name": "類型", "placeholder": "例如：tech startup", "defaultValue": "tech startup" },
+        { "name": "品牌名稱", "placeholder": "例如：NexaTech", "defaultValue": "NexaTech" },
+        { "name": "概念描述", "placeholder": "例如：innovation", "defaultValue": "innovation and connectivity" },
+        { "name": "風格", "placeholder": "例如：flat minimalist", "defaultValue": "flat minimalist geometric" },
+        { "name": "配色", "placeholder": "例如：blue gradient", "defaultValue": "electric blue to teal gradient" }
+      ]
+    },
+    {
+      "name": "建築視覺化",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nArchitectural visualization: {{建築描述}}. Style: {{建築風格}}. Environment: {{環境}}. Time of day: {{時間}}. Materials: {{材質}}. Photorealistic rendering, award-winning architectural photography.",
+      "tags": ["text-to-image", "architecture"],
+      "variables": [
+        { "name": "建築描述", "placeholder": "例如：modern glass villa", "defaultValue": "a modern glass villa with infinity pool" },
+        { "name": "建築風格", "placeholder": "例如：modernist", "defaultValue": "contemporary modernist" },
+        { "name": "環境", "placeholder": "例如：hillside ocean view", "defaultValue": "hillside with ocean panorama" },
+        { "name": "時間", "placeholder": "例如：golden hour", "defaultValue": "golden hour sunset" },
+        { "name": "材質", "placeholder": "例如：glass, concrete", "defaultValue": "floor-to-ceiling glass, exposed concrete, warm wood" }
+      ]
+    },
+    {
+      "name": "動漫角色設計",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nDesign an anime/manga character: {{角色描述}}. Hair: {{髮型髮色}}. Outfit: {{服裝}}. Pose: {{姿勢}}. Background: {{背景}}. Art style: {{畫風}}. Clean lines, vibrant colors, detailed character sheet.",
+      "tags": ["text-to-image", "anime", "character-design"],
+      "variables": [
+        { "name": "角色描述", "placeholder": "例如：female warrior", "defaultValue": "a fierce female warrior mage" },
+        { "name": "髮型髮色", "placeholder": "例如：long silver hair", "defaultValue": "long flowing silver hair with blue tips" },
+        { "name": "服裝", "placeholder": "例如：fantasy armor", "defaultValue": "ornate dark fantasy armor with glowing runes" },
+        { "name": "姿勢", "placeholder": "例如：battle stance", "defaultValue": "dynamic battle casting pose" },
+        { "name": "背景", "placeholder": "例如：magical forest", "defaultValue": "ancient magical forest with floating crystals" },
+        { "name": "畫風", "placeholder": "例如：detailed anime", "defaultValue": "detailed anime illustration, vibrant" }
+      ]
+    },
+    {
+      "name": "食物攝影",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nProfessional food photography: {{食物描述}}. Plating style: {{擺盤}}. Surface: {{桌面材質}}. Props: {{道具}}. Lighting: {{燈光}}. Shot from {{角度}}. Appetizing, editorial quality, for a gourmet magazine.",
+      "tags": ["text-to-image", "food", "photography"],
+      "variables": [
+        { "name": "食物描述", "placeholder": "例如：ramen bowl", "defaultValue": "a steaming bowl of tonkotsu ramen with soft-boiled egg" },
+        { "name": "擺盤", "placeholder": "例如：rustic", "defaultValue": "artisan rustic" },
+        { "name": "桌面材質", "placeholder": "例如：dark wood", "defaultValue": "weathered dark wood" },
+        { "name": "道具", "placeholder": "例如：chopsticks, napkin", "defaultValue": "bamboo chopsticks, linen napkin, small sake cup" },
+        { "name": "燈光", "placeholder": "例如：soft window light", "defaultValue": "soft natural window side light" },
+        { "name": "角度", "placeholder": "例如：overhead", "defaultValue": "45-degree angle" }
+      ]
+    },
+    {
+      "name": "風格轉換",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nTransform this image into {{目標風格}} style. Keep the original composition and subject matter. Apply {{藝術流派}} aesthetic. Adjust color palette to {{色調}}. Maintain structural integrity while fully adopting the new artistic style.",
+      "tags": ["image-to-image", "style-transfer"],
+      "variables": [
+        { "name": "目標風格", "placeholder": "例如：watercolor", "defaultValue": "impressionist watercolor" },
+        { "name": "藝術流派", "placeholder": "例如：impressionism", "defaultValue": "impressionism" },
+        { "name": "色調", "placeholder": "例如：warm pastels", "defaultValue": "warm pastel tones with soft blues" }
+      ]
+    },
+    {
+      "name": "角色一致性續圖",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nGenerate the same character: {{角色描述}} (maintain exact appearance, clothing, and features). New scene: {{新場景}}. New pose: {{新姿勢}}. Same art style as reference. Ensure character consistency across images.",
+      "tags": ["image-to-image", "character-consistency"],
+      "variables": [
+        { "name": "角色描述", "placeholder": "描述角色外觀", "defaultValue": "a young woman with short red hair, green eyes, wearing a brown leather jacket" },
+        { "name": "新場景", "placeholder": "例如：coffee shop", "defaultValue": "cozy coffee shop interior with warm lighting" },
+        { "name": "新姿勢", "placeholder": "例如：sitting, reading", "defaultValue": "sitting by the window, reading a book" }
+      ]
+    },
+    {
+      "name": "場景延伸",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nExpand this scene outward. The original image shows: {{原圖描述}}. Extend the scene to reveal: {{延伸方向與內容}}. Maintain consistent lighting, perspective, style, and color palette with the original.",
+      "tags": ["image-to-image", "outpainting"],
+      "variables": [
+        { "name": "原圖描述", "placeholder": "描述原圖內容", "defaultValue": "a castle on a cliff at sunset" },
+        { "name": "延伸方向與內容", "placeholder": "例如：expand left to show ocean", "defaultValue": "expand downward to reveal the winding path leading up the cliff, with a medieval village at the base" }
+      ]
+    },
+    {
+      "name": "Prompt 增強器",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\n我有一個簡單的圖片生成描述：「{{原始描述}}」。請幫我擴充為專業的 AI 圖片生成 prompt，包含：1) 主體細節描述 2) 環境與背景 3) 燈光設定 4) 鏡頭與構圖 5) 藝術風格 6) 品質關鍵字。輸出英文 prompt，可直接用於 Grok Imagine / Gemini 圖片生成。",
+      "tags": ["utility", "prompt-enhance"],
+      "variables": [
+        { "name": "原始描述", "placeholder": "例如：一隻貓坐在窗邊", "defaultValue": "一隻貓坐在窗邊看著雨" }
+      ]
+    },
+    {
+      "name": "負面提示詞組合",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nNegative prompt for high-quality generation: blurry, low quality, distorted, deformed, disfigured, bad anatomy, wrong proportions, extra limbs, extra fingers, mutated hands, poorly drawn, watermark, signature, text, logo, cropped, out of frame, duplicate, ugly, morbid, mutation. {{額外排除項目}}",
+      "tags": ["utility", "negative-prompt"],
+      "variables": [
+        { "name": "額外排除項目", "placeholder": "例如：nsfw, violence", "defaultValue": "" }
+      ]
+    },
+    {
+      "name": "16宮格 敘事分鏡圖",
+      "category": "圖片生成",
+      "content": "你是一位專家 act like an expert.\n\nCreate a 16-panel storyboard grid layout (4x4) depicting a narrative sequence.\nStory: {{故事情節}}.\nProtagonist: {{主角描述}}.\nStyle: {{風格}}.\n\nThe 16 panels must be clearly separated by thin borders, reading left-to-right, top-to-bottom. Varied cinematic camera angles (wide shots, extreme close-ups, over-the-shoulder). Consistent character design and environment across all panels. Show progression of time and action.",
+      "tags": ["text-to-image", "storyboard", "comic"],
+      "variables": [
+        { "name": "故事情節", "placeholder": "例如：英雄發現秘密武器並與反派對決", "defaultValue": "a hero discovers an ancient artifact, trains to use it, and finally confronts the dark lord" },
+        { "name": "主角描述", "placeholder": "例如：短髮冷酷女殺手", "defaultValue": "a young brave knight with silver armor and a red cape" },
+        { "name": "風格", "placeholder": "例如：日系黑白漫畫", "defaultValue": "cinematic professional storyboard sketch, monochrome with dramatic shading" }
+      ]
+    }
+  ]
+}

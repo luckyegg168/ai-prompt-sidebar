@@ -3,12 +3,14 @@
  * Injects the sidebar into supported AI chat platforms.
  */
 
-import { detectAdapter } from "../adapters/base";
+import { detectAdapter } from "../adapters";
 import {
   initDefaults,
   getTemplates,
   getCategories,
   getSettings,
+  getTabGroups,
+  getDefaultPrompts,
   addTemplate,
   updateTemplate,
   deleteTemplate,
@@ -34,12 +36,13 @@ import { TemplateUI, showToast } from "./template-ui";
   const settings = await getSettings();
   const templates = await getTemplates();
   const categories = await getCategories();
+  const tabGroups = await getTabGroups();
+  const defaultPrompts = await getDefaultPrompts();
 
   // Determine theme
-  const theme =
-    settings.theme === "auto" ? adapter.getTheme() : settings.theme;
+  const theme = settings.theme === "auto" ? adapter.getTheme() : settings.theme;
 
-  // ── Build sidebar skeleton ───────────────── 
+  // ── Build sidebar skeleton ─────────────────
   const sidebar = document.createElement("div");
   sidebar.id = "aps-sidebar";
   if (theme === "dark") sidebar.classList.add("aps-dark");
@@ -93,14 +96,16 @@ import { TemplateUI, showToast } from "./template-ui";
 
   // ── TemplateUI instance ─────────────────────
   const ui = new TemplateUI(contentArea, adapter);
-  ui.setData(templates, categories);
+  ui.setData(templates, categories, tabGroups, defaultPrompts);
 
   // Callbacks
   /** Refresh UI with fresh data from storage */
   async function refreshUI() {
     const freshT = await getTemplates();
     const freshC = await getCategories();
-    ui.setData(freshT, freshC);
+    const freshTG = await getTabGroups();
+    const freshDP = await getDefaultPrompts();
+    ui.setData(freshT, freshC, freshTG, freshDP);
   }
 
   ui.onAddTemplate = async (name, category, content) => {
@@ -132,9 +137,12 @@ import { TemplateUI, showToast } from "./template-ui";
   ui.onExportTemplates = async () => {
     const t = await getTemplates();
     const c = await getCategories();
-    const blob = new Blob([JSON.stringify({ categories: c, templates: t }, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob(
+      [JSON.stringify({ categories: c, templates: t }, null, 2)],
+      {
+        type: "application/json",
+      }
+    );
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -159,17 +167,21 @@ import { TemplateUI, showToast } from "./template-ui";
           return;
         }
         const now = Date.now();
-        const imported: Template[] = data.templates.map((t: Record<string, unknown>) => ({
-          id: crypto.randomUUID(),
-          name: String(t.name ?? ""),
-          category: String(t.category ?? "自訂"),
-          content: String(t.content ?? ""),
-          variables: extractVariables(String(t.content ?? "")),
-          platform: t.platform ? String(t.platform) : undefined,
-          tags: Array.isArray(t.tags) ? t.tags.map(String).filter((s: string) => s.length <= 50) : undefined,
-          createdAt: now,
-          updatedAt: now,
-        }));
+        const imported: Template[] = data.templates.map(
+          (t: Record<string, unknown>) => ({
+            id: crypto.randomUUID(),
+            name: String(t.name ?? ""),
+            category: String(t.category ?? "自訂"),
+            content: String(t.content ?? ""),
+            variables: extractVariables(String(t.content ?? "")),
+            platform: t.platform ? String(t.platform) : undefined,
+            tags: Array.isArray(t.tags)
+              ? t.tags.map(String).filter((s: string) => s.length <= 50)
+              : undefined,
+            createdAt: now,
+            updatedAt: now,
+          })
+        );
         const existing = await getTemplates();
         await saveTemplates([...existing, ...imported]);
         if (Array.isArray(data.categories)) {
@@ -193,7 +205,9 @@ import { TemplateUI, showToast } from "./template-ui";
         }
         const freshT = await getTemplates();
         const freshC = await getCategories();
-        ui.setData(freshT, freshC);
+        const freshTG = await getTabGroups();
+        const freshDP = await getDefaultPrompts();
+        ui.setData(freshT, freshC, freshTG, freshDP);
         showToast(`📥 已匯入 ${imported.length} 個模板`);
       } catch {
         showToast("匯入失敗，請確認檔案格式", true);
@@ -203,16 +217,22 @@ import { TemplateUI, showToast } from "./template-ui";
   };
 
   // Header button handlers
-  document.getElementById("aps-close-btn")!.addEventListener("click", toggleSidebar);
+  document
+    .getElementById("aps-close-btn")!
+    .addEventListener("click", toggleSidebar);
   document.getElementById("aps-add-btn")!.addEventListener("click", () => {
     ui.renderCreateView();
   });
-  document.getElementById("aps-refresh-btn")!.addEventListener("click", async () => {
-    const t = await getTemplates();
-    const c = await getCategories();
-    ui.setData(t, c);
-    showToast("✅ 已重新載入");
-  });
+  document
+    .getElementById("aps-refresh-btn")!
+    .addEventListener("click", async () => {
+      const t = await getTemplates();
+      const c = await getCategories();
+      const tg = await getTabGroups();
+      const dp = await getDefaultPrompts();
+      ui.setData(t, c, tg, dp);
+      showToast("✅ 已重新載入");
+    });
 
   // ── SPA navigation detection ────────────────
   let lastUrl = location.href;
