@@ -38,6 +38,13 @@ async function build() {
     outfile: resolve(__dirname, "dist/popup.js"),
   });
 
+  // Management page
+  const managementCtx = await esbuild.context({
+    ...commonOptions,
+    entryPoints: [resolve(__dirname, "src/management/management.ts")],
+    outfile: resolve(__dirname, "dist/management.js"),
+  });
+
   // Copy static assets
   const distDir = resolve(__dirname, "dist");
   if (!existsSync(distDir)) mkdirSync(distDir, { recursive: true });
@@ -79,6 +86,16 @@ async function build() {
     resolve(distDir, "general.json")
   );
 
+  // Copy management page
+  copyFileSync(
+    resolve(__dirname, "src/management/management.html"),
+    resolve(distDir, "management.html")
+  );
+  copyFileSync(
+    resolve(__dirname, "src/management/management.css"),
+    resolve(distDir, "management.css")
+  );
+
   // Copy icons
   const iconsDistDir = resolve(distDir, "icons");
   if (!existsSync(iconsDistDir)) mkdirSync(iconsDistDir, { recursive: true });
@@ -92,17 +109,20 @@ async function build() {
       contentCtx.watch(),
       workerCtx.watch(),
       popupCtx.watch(),
+      managementCtx.watch(),
     ]);
   } else {
     await Promise.all([
       contentCtx.rebuild(),
       workerCtx.rebuild(),
       popupCtx.rebuild(),
+      managementCtx.rebuild(),
     ]);
     await Promise.all([
       contentCtx.dispose(),
       workerCtx.dispose(),
       popupCtx.dispose(),
+      managementCtx.dispose(),
     ]);
     console.log("✅ Build complete → dist/");
   }

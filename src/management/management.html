@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>提示詞管理 - AI Prompt Sidebar</title>
+    <link rel="stylesheet" href="management.css" />
+  </head>
+  <body>
+    <div class="mgmt-container">
+      <!-- 左側：模板列表 -->
+      <aside class="mgmt-sidebar">
+        <div class="mgmt-sidebar-header">
+          <h1>📋 提示詞管理</h1>
+          <button id="close-btn" class="icon-btn" title="關閉">✕</button>
+        </div>
+
+        <div class="mgmt-search">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="🔍 搜尋模板..."
+            autocomplete="off"
+          />
+          <button id="new-template-btn" class="btn-primary" title="新增模板">
+            ＋
+          </button>
+        </div>
+
+        <div class="mgmt-filters">
+          <div class="filter-group">
+            <label>分類</label>
+            <select id="category-filter">
+              <option value="all">全部分類</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>標籤</label>
+            <select id="tag-filter">
+              <option value="all">全部標籤</option>
+            </select>
+          </div>
+          <div class="filter-actions">
+            <button id="fav-filter-btn" class="filter-btn" title="只显示收藏">
+              ⭐
+            </button>
+            <button id="export-btn" class="filter-btn" title="匯出模板">
+              📤
+            </button>
+            <button id="import-btn" class="filter-btn" title="匯入模板">
+              📥
+            </button>
+          </div>
+        </div>
+
+        <div class="mgmt-template-list" id="template-list">
+          <!-- 模板卡片列表將由 JS 動態生成 -->
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">載入中...</div>
+          </div>
+        </div>
+
+        <div class="mgmt-sidebar-footer">
+          <span id="template-count">0 個模板</span>
+        </div>
+      </aside>
+
+      <!-- 右側：編輯器 -->
+      <main class="mgmt-editor">
+        <div class="mgmt-editor-header">
+          <div class="editor-title-group">
+            <input
+              type="text"
+              id="template-name"
+              class="title-input"
+              placeholder="模板名稱"
+            />
+            <span class="unsaved-indicator" id="unsaved-indicator"
+              >● 未儲存</span
+            >
+          </div>
+          <div class="mgmt-actions">
+            <button id="preview-toggle-btn" class="btn-secondary">
+              👁️ 預覽
+            </button>
+            <button id="duplicate-btn" class="btn-secondary">📄 複製</button>
+            <button id="save-btn" class="btn-primary">💾 儲存</button>
+            <button id="delete-btn" class="btn-danger">🗑️ 刪除</button>
+          </div>
+        </div>
+
+        <div class="mgmt-editor-content">
+          <div class="mgmt-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="template-category">分類</label>
+                <div class="input-with-button">
+                  <select id="template-category"></select>
+                  <button
+                    id="add-category-btn"
+                    class="btn-small"
+                    title="新增分類"
+                  >
+                    ＋
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="template-tags">標籤（逗號分隔）</label>
+                <input
+                  type="text"
+                  id="template-tags"
+                  placeholder="text-to-image, cinematic"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="template-content">提示詞內容</label>
+              <div class="content-editor-wrapper">
+                <textarea
+                  id="template-content"
+                  placeholder="使用 {{變數}} 標記變數，例如：請分析 {{股票代號}} 的基本面..."
+                ></textarea>
+                <div class="editor-toolbar">
+                  <span class="toolbar-hint"
+                    >使用 <code>{{變數名稱}}</code>
+                    標記變數，系統會自動偵測</span
+                  >
+                </div>
+              </div>
+              <div class="variable-hints" id="variable-hints">
+                <!-- 自動偵測的變數列表將由 JS 動態生成 -->
+              </div>
+            </div>
+
+            <!-- 預覽區域（預設隱藏） -->
+            <div class="form-group preview-section" id="preview-section">
+              <label>預覽</label>
+              <div class="preview-panel" id="template-preview">
+                <div class="preview-placeholder">
+                  點擊「👁️ 預覽」按鈕查看填入變數後的效果
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分類管理 Modal -->
+        <div class="modal-overlay" id="category-modal-overlay">
+          <div class="modal" id="category-modal">
+            <div class="modal-header">
+              <h2>管理分類</h2>
+              <button class="modal-close" id="category-modal-close">✕</button>
+            </div>
+            <div class="modal-content">
+              <div class="category-list" id="category-list">
+                <!-- 分類列表將由 JS 動態生成 -->
+              </div>
+              <div class="category-form">
+                <input
+                  type="text"
+                  id="new-category-name"
+                  placeholder="新分類名稱"
+                />
+                <input
+                  type="text"
+                  id="new-category-icon"
+                  placeholder="圖示（emoji）"
+                  maxlength="2"
+                />
+                <button id="add-category-confirm-btn" class="btn-primary">
+                  新增分類
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 匯入 Modal -->
+        <div class="modal-overlay" id="import-modal-overlay">
+          <div class="modal" id="import-modal">
+            <div class="modal-header">
+              <h2>匯入模板</h2>
+              <button class="modal-close" id="import-modal-close">✕</button>
+            </div>
+            <div class="modal-content">
+              <div class="import-area">
+                <textarea
+                  id="import-json"
+                  placeholder="貼上 JSON 格式的模板資料..."
+                ></textarea>
+                <div class="import-actions">
+                  <button id="import-file-btn" class="btn-secondary">
+                    📁 選擇檔案
+                  </button>
+                  <input
+                    type="file"
+                    id="import-file-input"
+                    accept=".json"
+                    style="display: none"
+                  />
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button id="import-confirm-btn" class="btn-primary">
+                  確認匯入
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div id="toast-container"></div>
+
+    <script src="management.js"></script>
+  </body>
+</html>

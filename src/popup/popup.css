@@ -87,6 +87,16 @@ body {
   margin-top: 16px;
 }
 
+.popup-section-bordered {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.popup-btn-full {
+  width: 100%;
+}
+
 .popup-btn {
   flex: 1;
   padding: 8px;

@@ -36,6 +36,12 @@ chrome.commands?.onCommand.addListener((command) => {
       }
     });
   }
+  if (command === "open-management") {
+    // Open management page in a new tab
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("management.html"),
+    });
+  }
 });
 
 // Handle messages from popup

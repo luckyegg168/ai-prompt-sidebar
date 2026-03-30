@@ -29,6 +29,7 @@ export default [
         fetch: "readonly",
         console: "readonly",
         process: "readonly",
+        prompt: "readonly",
         // Chrome extension globals
         chrome: "readonly",
         // Jest globals (for test files)

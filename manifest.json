@@ -52,6 +52,13 @@
         "mac": "Command+Shift+P"
       },
       "description": "切換 AI Prompt Sidebar"
+    },
+    "open-management": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+M",
+        "mac": "Command+Shift+M"
+      },
+      "description": "開啟提示詞管理頁面"
     }
   },
   "web_accessible_resources": [

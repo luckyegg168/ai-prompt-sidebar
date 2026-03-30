@@ -16,6 +16,9 @@ const widthSlider = document.getElementById(
 const widthValue = document.getElementById("width-value") as HTMLSpanElement;
 const toggleBtn = document.getElementById("toggle-btn") as HTMLButtonElement;
 const resetBtn = document.getElementById("reset-btn") as HTMLButtonElement;
+const openManagementBtn = document.getElementById(
+  "open-management-btn"
+) as HTMLButtonElement;
 
 // Load current settings
 (async () => {
@@ -59,6 +62,13 @@ widthSlider.addEventListener("change", async () => {
 toggleBtn.addEventListener("click", () => {
   notifyContentScript("TOGGLE_SIDEBAR");
   window.close();
+});
+
+// Open management page
+openManagementBtn.addEventListener("click", () => {
+  chrome.tabs.create({
+    url: chrome.runtime.getURL("management.html"),
+  });
 });
 
 // Reset to defaults
