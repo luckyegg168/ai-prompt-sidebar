@@ -410,11 +410,19 @@ export class TemplateUI {
   private makeCard(tpl: Template): HTMLElement {
     const card = el("div", "aps-template-card");
 
-    // Header row: name + favorite star
-    const headerRow = el("div", "aps-card-header");
-    const name = el("div", "aps-card-name");
+    // Single compact row: name · optional var badge · star button
+    const row = el("div", "aps-card-row");
+
+    const name = el("span", "aps-card-name");
     name.textContent = tpl.name;
-    headerRow.appendChild(name);
+    row.appendChild(name);
+
+    if (tpl.variables.length > 0) {
+      const badge = el("span", "aps-var-badge");
+      badge.textContent = `{${tpl.variables.length}}`;
+      badge.title = tpl.variables.map((v) => `{{${v.name}}}`).join("  ");
+      row.appendChild(badge);
+    }
 
     const starBtn = el(
       "button",
@@ -426,39 +434,8 @@ export class TemplateUI {
       e.stopPropagation();
       this.onToggleFavorite?.(tpl.id, !tpl.isFavorite);
     });
-    headerRow.appendChild(starBtn);
-    card.appendChild(headerRow);
-
-    const preview = el("div", "aps-card-preview");
-    preview.textContent =
-      tpl.content.slice(0, 120) + (tpl.content.length > 120 ? "…" : "");
-    card.appendChild(preview);
-
-    // Tag pills (template tags, not variable tags)
-    if (tpl.tags && tpl.tags.length > 0) {
-      const tagRow = el("div", "aps-card-tag-pills");
-      for (const tag of tpl.tags.slice(0, 3)) {
-        const pill = el("span", "aps-tag-pill");
-        pill.textContent = tag;
-        tagRow.appendChild(pill);
-      }
-      if (tpl.tags.length > 3) {
-        const more = el("span", "aps-tag-pill aps-tag-more");
-        more.textContent = `+${tpl.tags.length - 3}`;
-        tagRow.appendChild(more);
-      }
-      card.appendChild(tagRow);
-    }
-
-    if (tpl.variables.length > 0) {
-      const tags = el("div", "aps-card-tags");
-      for (const v of tpl.variables) {
-        const tag = el("span", "aps-var-tag");
-        tag.textContent = `{{${v.name}}}`;
-        tags.appendChild(tag);
-      }
-      card.appendChild(tags);
-    }
+    row.appendChild(starBtn);
+    card.appendChild(row);
 
     card.addEventListener("click", () => {
       if (tpl.variables.length > 0) {

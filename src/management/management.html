@@ -50,6 +50,9 @@
             <button id="import-btn" class="filter-btn" title="匯入模板">
               📥
             </button>
+            <button id="scheduler-btn" class="filter-btn" title="定時發送">
+              ⏰
+            </button>
           </div>
         </div>
 
@@ -148,6 +151,50 @@
           </div>
         </div>
 
+        <!-- 匯出 Modal -->
+        <div class="modal-overlay" id="export-modal-overlay">
+          <div class="modal modal-large" id="export-modal">
+            <div class="modal-header">
+              <h2>📤 匯出模板</h2>
+              <button class="modal-close" id="export-modal-close">✕</button>
+            </div>
+            <div class="modal-content">
+              <div class="export-options">
+                <label class="radio-option">
+                  <input type="radio" name="export-mode" value="all" checked />
+                  <span>全部匯出</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="export-mode" value="by-category" />
+                  <span>按分類匯出（各分類獨立檔案）</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="export-mode" value="selected" />
+                  <span>自訂選擇</span>
+                </label>
+              </div>
+
+              <!-- 分類選擇區（by-category / selected 模式顯示） -->
+              <div id="export-selection-area" class="export-selection-area hidden">
+                <div class="export-select-header">
+                  <label>
+                    <input type="checkbox" id="export-select-all-cb" />
+                    <strong>全選</strong>
+                  </label>
+                  <span id="export-selected-count" class="export-count-badge">已選 0 個</span>
+                </div>
+                <div id="export-category-tree" class="export-category-tree">
+                  <!-- 動態生成分類樹 -->
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button id="export-cancel-btn" class="btn-secondary">取消</button>
+              <button id="export-confirm-btn" class="btn-primary">📤 確認匯出</button>
+            </div>
+          </div>
+        </div>
+
         <!-- 分類管理 Modal -->
         <div class="modal-overlay" id="category-modal-overlay">
           <div class="modal" id="category-modal">
@@ -183,10 +230,25 @@
         <div class="modal-overlay" id="import-modal-overlay">
           <div class="modal" id="import-modal">
             <div class="modal-header">
-              <h2>匯入模板</h2>
+              <h2>📥 匯入模板</h2>
               <button class="modal-close" id="import-modal-close">✕</button>
             </div>
             <div class="modal-content">
+              <div class="import-mode-selector">
+                <span class="import-mode-label">匯入方式：</span>
+                <label class="radio-option">
+                  <input type="radio" name="import-mode" value="merge" checked />
+                  <span>合併（保留現有，僅新增不存在的模板）</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="import-mode" value="overwrite" />
+                  <span>覆蓋（取代相同 ID 的模板）</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="import-mode" value="replace-all" />
+                  <span>全部取代（清空現有後匯入）</span>
+                </label>
+              </div>
               <div class="import-area">
                 <textarea
                   id="import-json"
@@ -204,10 +266,111 @@
                   />
                 </div>
               </div>
-              <div class="modal-footer">
-                <button id="import-confirm-btn" class="btn-primary">
-                  確認匯入
-                </button>
+            </div>
+            <div class="modal-footer">
+              <button id="import-cancel-btn" class="btn-secondary">取消</button>
+              <button id="import-confirm-btn" class="btn-primary">📥 確認匯入</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 定時發送 Modal -->
+        <div class="modal-overlay" id="scheduler-modal-overlay">
+          <div class="modal modal-large" id="scheduler-modal">
+            <div class="modal-header">
+              <h2>⏰ 定時發送</h2>
+              <button class="modal-close" id="scheduler-modal-close">✕</button>
+            </div>
+            <div class="modal-content scheduler-modal-content">
+              <!-- 任務列表 -->
+              <div class="scheduler-section">
+                <div class="scheduler-section-header">
+                  <h3>排程任務</h3>
+                  <button id="add-task-btn" class="btn-primary btn-sm">＋ 新增任務</button>
+                </div>
+                <div id="scheduler-task-list" class="scheduler-task-list">
+                  <div class="empty-state">尚無排程任務</div>
+                </div>
+              </div>
+
+              <!-- 任務表單（新增 / 編輯） -->
+              <div id="scheduler-form-section" class="scheduler-form-section hidden">
+                <h3 id="scheduler-form-title">新增排程任務</h3>
+                <input type="hidden" id="scheduler-task-id" />
+                <div class="form-group">
+                  <label>任務名稱</label>
+                  <input type="text" id="task-name" placeholder="例：每日晨報分析" />
+                </div>
+                <div class="form-group">
+                  <label>選擇模板</label>
+                  <select id="task-template">
+                    <option value="">— 選擇模板 —</option>
+                  </select>
+                </div>
+                <div class="form-group" id="task-variables-group" style="display:none">
+                  <label>模板變數</label>
+                  <div id="task-variables-list" class="task-variables-list"></div>
+                </div>
+                <div class="form-group">
+                  <label>目標平台</label>
+                  <select id="task-platform">
+                    <option value="grok">Grok（grok.com）</option>
+                    <option value="gemini">Gemini（gemini.google.com）</option>
+                    <option value="chatgpt">ChatGPT（chatgpt.com）</option>
+                    <option value="claude">Claude（claude.ai）</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>排程類型</label>
+                  <div class="schedule-type-row">
+                    <label class="radio-option">
+                      <input type="radio" name="schedule-type" value="once" checked />
+                      <span>一次性</span>
+                    </label>
+                    <label class="radio-option">
+                      <input type="radio" name="schedule-type" value="daily" />
+                      <span>每天</span>
+                    </label>
+                    <label class="radio-option">
+                      <input type="radio" name="schedule-type" value="weekly" />
+                      <span>每週</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="form-group" id="schedule-once-group">
+                  <label>執行時間</label>
+                  <input type="datetime-local" id="task-datetime" />
+                </div>
+                <div class="form-group hidden" id="schedule-recurring-group">
+                  <label>每日時間</label>
+                  <input type="time" id="task-time" value="09:00" />
+                </div>
+                <div class="form-group hidden" id="schedule-weekday-group">
+                  <label>重複星期</label>
+                  <div class="weekday-picker" id="weekday-picker">
+                    <button class="weekday-btn" data-day="0">日</button>
+                    <button class="weekday-btn" data-day="1">一</button>
+                    <button class="weekday-btn" data-day="2">二</button>
+                    <button class="weekday-btn" data-day="3">三</button>
+                    <button class="weekday-btn" data-day="4">四</button>
+                    <button class="weekday-btn" data-day="5">五</button>
+                    <button class="weekday-btn" data-day="6">六</button>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="toggle-row">
+                    <span>自動送出</span>
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="task-auto-submit" />
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </label>
+                  <small class="form-hint">啟用後將自動點擊送出按鈕</small>
+                </div>
+                <div class="form-actions">
+                  <button id="scheduler-form-cancel" class="btn-secondary">取消</button>
+                  <button id="scheduler-form-save" class="btn-primary">💾 儲存任務</button>
+                </div>
               </div>
             </div>
           </div>

@@ -6,6 +6,7 @@ import {
   DefaultsManifest,
   TemplateFile,
   DEFAULT_SETTINGS,
+  ScheduledTask,
   extractVariables,
 } from "../models/template";
 import { StorageError, TemplateError, logError } from "../utils";
@@ -16,6 +17,7 @@ type StorageData = {
   settings: Settings;
   tabGroups: TabGroup[];
   defaultPrompts: Record<string, string[]>; // tabGroupId -> prompts
+  scheduledTasks: ScheduledTask[];
 };
 
 function getStorage(): typeof chrome.storage.local {
@@ -28,7 +30,7 @@ function getStorage(): typeof chrome.storage.local {
 export async function loadAll(): Promise<StorageData> {
   return new Promise((resolve, reject) => {
     getStorage().get(
-      ["templates", "categories", "settings", "tabGroups", "defaultPrompts"],
+      ["templates", "categories", "settings", "tabGroups", "defaultPrompts", "scheduledTasks"],
       (result) => {
         if (chrome.runtime.lastError) {
           const error = new StorageError(
@@ -46,6 +48,7 @@ export async function loadAll(): Promise<StorageData> {
           settings: { ...DEFAULT_SETTINGS, ...(result.settings ?? {}) },
           tabGroups: result.tabGroups ?? [],
           defaultPrompts: result.defaultPrompts ?? {},
+          scheduledTasks: result.scheduledTasks ?? [],
         });
       }
     );
@@ -435,4 +438,63 @@ export async function initDefaults(defaultsUrl: string): Promise<void> {
     });
     console.error("[AISidebar] Failed to load defaults:", err);
   }
+}
+
+// ── Scheduled Tasks ────────────────────────────────────────────────────
+
+export async function getScheduledTasks(): Promise<ScheduledTask[]> {
+  const data = await loadAll();
+  return data.scheduledTasks;
+}
+
+export async function saveScheduledTasks(
+  tasks: ScheduledTask[]
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    getStorage().set({ scheduledTasks: tasks }, () => {
+      if (chrome.runtime.lastError) {
+        const error = new StorageError(
+          chrome.runtime.lastError.message ?? "Unknown storage error",
+          "scheduledTasks",
+          "set"
+        );
+        logError(error, {
+          module: "storage/templates",
+          function: "saveScheduledTasks",
+        });
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+export async function addScheduledTask(
+  partial: Omit<ScheduledTask, "id" | "createdAt">
+): Promise<ScheduledTask> {
+  const tasks = await getScheduledTasks();
+  const task: ScheduledTask = {
+    ...partial,
+    id: crypto.randomUUID(),
+    createdAt: Date.now(),
+  };
+  await saveScheduledTasks([...tasks, task]);
+  return task;
+}
+
+export async function updateScheduledTask(
+  id: string,
+  partial: Partial<ScheduledTask>
+): Promise<void> {
+  const tasks = await getScheduledTasks();
+  const next = tasks.map((t) =>
+    t.id === id ? { ...t, ...partial } : t
+  );
+  await saveScheduledTasks(next);
+}
+
+export async function deleteScheduledTask(id: string): Promise<void> {
+  const tasks = await getScheduledTasks();
+  await saveScheduledTasks(tasks.filter((t) => t.id !== id));
 }

@@ -57,6 +57,35 @@ export const DEFAULT_SETTINGS: Settings = {
   theme: "auto",
 };
 
+export type ScheduleType = "once" | "daily" | "weekly";
+export type PlatformKey = "grok" | "gemini" | "chatgpt" | "claude";
+
+export const PLATFORM_URLS: Record<PlatformKey, string> = {
+  grok: "https://grok.com/",
+  gemini: "https://gemini.google.com/",
+  chatgpt: "https://chatgpt.com/",
+  claude: "https://claude.ai/",
+};
+
+export interface ScheduledTask {
+  id: string;
+  name: string;
+  templateId: string;
+  platform: PlatformKey;
+  /** Variables to fill into template at send time */
+  variables: Record<string, string>;
+  scheduleType: ScheduleType;
+  /** ISO datetime string for 'once'; HH:mm string for 'daily'/'weekly' */
+  scheduleTime: string;
+  /** Days of week (0=Sun … 6=Sat) for 'weekly' */
+  weekdays: number[];
+  enabled: boolean;
+  autoSubmit: boolean;
+  lastRunAt?: number;
+  nextRunAt: number;
+  createdAt: number;
+}
+
 /** Extract {{variable}} placeholders from template content */
 export function extractVariables(content: string): Variable[] {
   const regex = /\{\{([^}]+)\}\}/g;

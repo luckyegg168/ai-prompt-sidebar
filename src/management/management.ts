@@ -6,6 +6,9 @@
 import {
   Template,
   Category,
+  ScheduledTask,
+  ScheduleType,
+  PLATFORM_URLS,
   extractVariables,
   fillTemplate,
 } from "../models/template";
@@ -18,6 +21,10 @@ import {
   updateTemplate,
   deleteTemplate,
   initDefaults,
+  getScheduledTasks,
+  addScheduledTask,
+  updateScheduledTask,
+  deleteScheduledTask,
 } from "../storage/templates";
 
 // ── 狀態管理 ───────────────────────────────
@@ -25,6 +32,7 @@ import {
 interface AppState {
   templates: Template[];
   categories: Category[];
+  scheduledTasks: ScheduledTask[];
   selectedTemplateId: string | null;
   searchQuery: string;
   selectedCategory: string;
@@ -37,6 +45,7 @@ interface AppState {
 const state: AppState = {
   templates: [],
   categories: [],
+  scheduledTasks: [],
   selectedTemplateId: null,
   searchQuery: "",
   selectedCategory: "all",
@@ -58,6 +67,7 @@ interface Elements {
   favFilterBtn: HTMLElement | null;
   exportBtn: HTMLElement | null;
   importBtn: HTMLElement | null;
+  schedulerBtn: HTMLElement | null;
   templateList: HTMLElement | null;
   templateCount: HTMLElement | null;
   newTemplateBtn: HTMLElement | null;
@@ -86,13 +96,48 @@ interface Elements {
   newCategoryIcon: HTMLInputElement | null;
   addCategoryConfirmBtn: HTMLElement | null;
 
+  // 匯出 Modal
+  exportModalOverlay: HTMLElement | null;
+  exportModalClose: HTMLElement | null;
+  exportCancelBtn: HTMLElement | null;
+  exportConfirmBtn: HTMLElement | null;
+  exportSelectionArea: HTMLElement | null;
+  exportSelectAllCb: HTMLInputElement | null;
+  exportSelectedCount: HTMLElement | null;
+  exportCategoryTree: HTMLElement | null;
+
+  // 匯入 Modal
   importModalOverlay: HTMLElement | null;
   importModal: HTMLElement | null;
   importModalClose: HTMLElement | null;
   importJson: HTMLTextAreaElement | null;
   importFileBtn: HTMLElement | null;
   importFileInput: HTMLInputElement | null;
+  importCancelBtn: HTMLElement | null;
   importConfirmBtn: HTMLElement | null;
+
+  // 定時發送 Modal
+  schedulerModalOverlay: HTMLElement | null;
+  schedulerModalClose: HTMLElement | null;
+  addTaskBtn: HTMLElement | null;
+  schedulerTaskList: HTMLElement | null;
+  schedulerFormSection: HTMLElement | null;
+  schedulerFormTitle: HTMLElement | null;
+  schedulerTaskId: HTMLInputElement | null;
+  taskName: HTMLInputElement | null;
+  taskTemplate: HTMLSelectElement | null;
+  taskVariablesGroup: HTMLElement | null;
+  taskVariablesList: HTMLElement | null;
+  taskPlatform: HTMLSelectElement | null;
+  taskDatetime: HTMLInputElement | null;
+  taskTime: HTMLInputElement | null;
+  taskAutoSubmit: HTMLInputElement | null;
+  scheduleOnceGroup: HTMLElement | null;
+  scheduleRecurringGroup: HTMLElement | null;
+  scheduleWeekdayGroup: HTMLElement | null;
+  weekdayPicker: HTMLElement | null;
+  schedulerFormCancel: HTMLElement | null;
+  schedulerFormSave: HTMLElement | null;
 
   toastContainer: HTMLElement | null;
 }
@@ -108,6 +153,7 @@ function cacheElements() {
     favFilterBtn: document.getElementById("fav-filter-btn"),
     exportBtn: document.getElementById("export-btn"),
     importBtn: document.getElementById("import-btn"),
+    schedulerBtn: document.getElementById("scheduler-btn"),
     templateList: document.getElementById("template-list"),
     templateCount: document.getElementById("template-count"),
     newTemplateBtn: document.getElementById("new-template-btn"),
@@ -139,6 +185,16 @@ function cacheElements() {
     newCategoryIcon: document.getElementById("new-category-icon") as HTMLInputElement | null,
     addCategoryConfirmBtn: document.getElementById("add-category-confirm-btn"),
 
+    // 匯出 Modal
+    exportModalOverlay: document.getElementById("export-modal-overlay"),
+    exportModalClose: document.getElementById("export-modal-close"),
+    exportCancelBtn: document.getElementById("export-cancel-btn"),
+    exportConfirmBtn: document.getElementById("export-confirm-btn"),
+    exportSelectionArea: document.getElementById("export-selection-area"),
+    exportSelectAllCb: document.getElementById("export-select-all-cb") as HTMLInputElement | null,
+    exportSelectedCount: document.getElementById("export-selected-count"),
+    exportCategoryTree: document.getElementById("export-category-tree"),
+
     // 匯入 Modal
     importModalOverlay: document.getElementById("import-modal-overlay"),
     importModal: document.getElementById("import-modal"),
@@ -146,7 +202,31 @@ function cacheElements() {
     importJson: document.getElementById("import-json") as HTMLTextAreaElement | null,
     importFileBtn: document.getElementById("import-file-btn"),
     importFileInput: document.getElementById("import-file-input") as HTMLInputElement | null,
+    importCancelBtn: document.getElementById("import-cancel-btn"),
     importConfirmBtn: document.getElementById("import-confirm-btn"),
+
+    // 定時發送 Modal
+    schedulerModalOverlay: document.getElementById("scheduler-modal-overlay"),
+    schedulerModalClose: document.getElementById("scheduler-modal-close"),
+    addTaskBtn: document.getElementById("add-task-btn"),
+    schedulerTaskList: document.getElementById("scheduler-task-list"),
+    schedulerFormSection: document.getElementById("scheduler-form-section"),
+    schedulerFormTitle: document.getElementById("scheduler-form-title"),
+    schedulerTaskId: document.getElementById("scheduler-task-id") as HTMLInputElement | null,
+    taskName: document.getElementById("task-name") as HTMLInputElement | null,
+    taskTemplate: document.getElementById("task-template") as HTMLSelectElement | null,
+    taskVariablesGroup: document.getElementById("task-variables-group"),
+    taskVariablesList: document.getElementById("task-variables-list"),
+    taskPlatform: document.getElementById("task-platform") as HTMLSelectElement | null,
+    taskDatetime: document.getElementById("task-datetime") as HTMLInputElement | null,
+    taskTime: document.getElementById("task-time") as HTMLInputElement | null,
+    taskAutoSubmit: document.getElementById("task-auto-submit") as HTMLInputElement | null,
+    scheduleOnceGroup: document.getElementById("schedule-once-group"),
+    scheduleRecurringGroup: document.getElementById("schedule-recurring-group"),
+    scheduleWeekdayGroup: document.getElementById("schedule-weekday-group"),
+    weekdayPicker: document.getElementById("weekday-picker"),
+    schedulerFormCancel: document.getElementById("scheduler-form-cancel"),
+    schedulerFormSave: document.getElementById("scheduler-form-save"),
 
     // Toast
     toastContainer: document.getElementById("toast-container"),
@@ -187,6 +267,7 @@ async function loadData() {
 
     state.templates = await getTemplates();
     state.categories = await getCategories();
+    state.scheduledTasks = await getScheduledTasks();
 
     // 載入主題設定
     const result = await new Promise<{ settings?: { theme: string } }>(
@@ -241,16 +322,37 @@ function setupEventListeners() {
   });
 
   // 匯出
-  els.exportBtn?.addEventListener("click", handleExport);
+  els.exportBtn?.addEventListener("click", openExportModal);
+
+  // 匯出 Modal
+  els.exportModalClose?.addEventListener("click", closeExportModal);
+  els.exportCancelBtn?.addEventListener("click", closeExportModal);
+  els.exportConfirmBtn?.addEventListener("click", handleExportConfirm);
+
+  document.querySelectorAll('input[name="export-mode"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      const mode = (e.target as HTMLInputElement).value;
+      const showSelection = mode === "by-category" || mode === "selected";
+      els.exportSelectionArea?.classList.toggle("hidden", !showSelection);
+      if (showSelection) updateExportSelectedCount();
+    });
+  });
+
+  els.exportSelectAllCb?.addEventListener("change", (e) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    els.exportCategoryTree?.querySelectorAll<HTMLInputElement>("input[type=checkbox]").forEach((cb) => {
+      cb.checked = checked;
+    });
+    updateExportSelectedCount();
+  });
 
   // 匯入
   els.importBtn?.addEventListener("click", () => {
     els.importModalOverlay?.classList.add("visible");
   });
 
-  els.importModalClose?.addEventListener("click", () => {
-    els.importModalOverlay?.classList.remove("visible");
-  });
+  els.importModalClose?.addEventListener("click", closeImportModal);
+  els.importCancelBtn?.addEventListener("click", closeImportModal);
 
   els.importFileBtn?.addEventListener("click", () => {
     els.importFileInput?.click();
@@ -259,6 +361,36 @@ function setupEventListeners() {
   els.importFileInput?.addEventListener("change", handleFileSelect);
 
   els.importConfirmBtn?.addEventListener("click", handleImport);
+
+  // 定時發送
+  els.schedulerBtn?.addEventListener("click", openSchedulerModal);
+  els.schedulerModalClose?.addEventListener("click", closeSchedulerModal);
+
+  els.addTaskBtn?.addEventListener("click", () => {
+    openSchedulerForm(null);
+  });
+
+  els.schedulerFormCancel?.addEventListener("click", () => {
+    els.schedulerFormSection?.classList.add("hidden");
+  });
+
+  els.schedulerFormSave?.addEventListener("click", handleSaveTask);
+
+  document.querySelectorAll('input[name="schedule-type"]').forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      updateScheduleTypeUI((e.target as HTMLInputElement).value as ScheduleType);
+    });
+  });
+
+  els.weekdayPicker?.querySelectorAll(".weekday-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("active");
+    });
+  });
+
+  els.taskTemplate?.addEventListener("change", () => {
+    renderTaskVariables();
+  });
 
   // 新增模板
   els.newTemplateBtn?.addEventListener("click", () => {
@@ -321,7 +453,9 @@ function setupEventListeners() {
     // Escape: 關閉 Modal
     if (e.key === "Escape") {
       els.categoryModalOverlay?.classList.remove("visible");
-      els.importModalOverlay?.classList.remove("visible");
+      closeImportModal();
+      closeExportModal();
+      closeSchedulerModal();
     }
   });
 }
@@ -836,23 +970,169 @@ async function deleteCategory(id: string) {
 
 // ── 匯入/匯出 ───────────────────────────────
 
-function handleExport() {
-  const data = {
-    categories: state.categories,
-    templates: state.templates,
-  };
+// ── 匯出 Modal ───────────────────────────────
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], {
-    type: "application/json",
+function openExportModal() {
+  // Reset to "all" mode
+  const allRadio = document.querySelector<HTMLInputElement>('input[name="export-mode"][value="all"]');
+  if (allRadio) allRadio.checked = true;
+  els.exportSelectionArea?.classList.add("hidden");
+  renderExportCategoryTree();
+  els.exportModalOverlay?.classList.add("visible");
+}
+
+function closeExportModal() {
+  els.exportModalOverlay?.classList.remove("visible");
+}
+
+function renderExportCategoryTree() {
+  const tree = els.exportCategoryTree;
+  if (!tree) return;
+
+  const byCategory = new Map<string, Template[]>();
+  for (const tpl of state.templates) {
+    const arr = byCategory.get(tpl.category) ?? [];
+    arr.push(tpl);
+    byCategory.set(tpl.category, arr);
+  }
+
+  tree.innerHTML = Array.from(byCategory.entries())
+    .map(([catName, templates]) => {
+      const cat = state.categories.find((c) => c.name === catName);
+      const icon = cat?.icon ?? "📁";
+      const catId = `export-cat-${catName.replace(/\s+/g, "_")}`;
+      return `
+        <div class="export-category-node">
+          <label class="export-category-label">
+            <input type="checkbox" class="export-cat-cb" data-cat="${escapeHtml(catName)}" id="${catId}" checked />
+            <span>${icon} ${escapeHtml(catName)} (${templates.length})</span>
+          </label>
+          <div class="export-template-list">
+            ${templates.map((tpl) => `
+              <label class="export-template-label">
+                <input type="checkbox" class="export-tpl-cb" data-id="${tpl.id}" data-cat="${escapeHtml(catName)}" checked />
+                <span class="export-tpl-name">${escapeHtml(tpl.name)}</span>
+              </label>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  // Category checkbox toggles its templates
+  tree.querySelectorAll<HTMLInputElement>(".export-cat-cb").forEach((catCb) => {
+    catCb.addEventListener("change", () => {
+      const cat = catCb.dataset.cat;
+      tree.querySelectorAll<HTMLInputElement>(`.export-tpl-cb[data-cat="${cat}"]`).forEach((cb) => {
+        cb.checked = catCb.checked;
+      });
+      updateExportSelectedCount();
+    });
   });
+  tree.querySelectorAll<HTMLInputElement>(".export-tpl-cb").forEach((cb) => {
+    cb.addEventListener("change", () => updateExportSelectedCount());
+  });
+
+  updateExportSelectedCount();
+}
+
+function updateExportSelectedCount() {
+  const checked = els.exportCategoryTree?.querySelectorAll<HTMLInputElement>(".export-tpl-cb:checked").length ?? 0;
+  if (els.exportSelectedCount) {
+    els.exportSelectedCount.textContent = `已選 ${checked} 個`;
+  }
+  // Sync select-all checkbox
+  const total = els.exportCategoryTree?.querySelectorAll<HTMLInputElement>(".export-tpl-cb").length ?? 0;
+  if (els.exportSelectAllCb) {
+    els.exportSelectAllCb.checked = checked === total && total > 0;
+    els.exportSelectAllCb.indeterminate = checked > 0 && checked < total;
+  }
+}
+
+function handleExportConfirm() {
+  const mode = document.querySelector<HTMLInputElement>('input[name="export-mode"]:checked')?.value ?? "all";
+
+  if (mode === "all") {
+    downloadJson(
+      { categories: state.categories, templates: state.templates },
+      `ai-prompts-${dateStamp()}.json`
+    );
+    closeExportModal();
+    showToast(`📤 已匯出全部 ${state.templates.length} 個模板`);
+    return;
+  }
+
+  const selectedIds = new Set(
+    Array.from(
+      els.exportCategoryTree?.querySelectorAll<HTMLInputElement>(".export-tpl-cb:checked") ?? []
+    ).map((cb) => cb.dataset.id ?? "")
+  );
+
+  if (selectedIds.size === 0) {
+    showToast("請至少選擇一個模板", true);
+    return;
+  }
+
+  const selectedTemplates = state.templates.filter((t) => selectedIds.has(t.id));
+
+  if (mode === "selected") {
+    const usedCatNames = new Set(selectedTemplates.map((t) => t.category));
+    const usedCategories = state.categories.filter((c) => usedCatNames.has(c.name));
+    downloadJson(
+      { categories: usedCategories, templates: selectedTemplates },
+      `ai-prompts-selected-${dateStamp()}.json`
+    );
+    closeExportModal();
+    showToast(`📤 已匯出 ${selectedTemplates.length} 個模板`);
+    return;
+  }
+
+  // by-category: export one file per checked category
+  const selectedCatNames = new Set(
+    Array.from(
+      els.exportCategoryTree?.querySelectorAll<HTMLInputElement>(".export-cat-cb:checked") ?? []
+    ).map((cb) => cb.dataset.cat ?? "")
+  );
+
+  if (selectedCatNames.size === 0) {
+    showToast("請至少選擇一個分類", true);
+    return;
+  }
+
+  let totalExported = 0;
+  for (const catName of selectedCatNames) {
+    const cat = state.categories.find((c) => c.name === catName);
+    const templates = selectedTemplates.filter((t) => t.category === catName);
+    if (templates.length === 0) continue;
+    downloadJson(
+      { categories: cat ? [cat] : [], templates },
+      `ai-prompts-${catName.replace(/\s+/g, "_")}-${dateStamp()}.json`
+    );
+    totalExported += templates.length;
+  }
+  closeExportModal();
+  showToast(`📤 已匯出 ${totalExported} 個模板 (${selectedCatNames.size} 個分類)`);
+}
+
+function downloadJson(data: unknown, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `ai-prompt-templates-${new Date().toISOString().split("T")[0]}.json`;
+  a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
+}
 
-  showToast("📤 模板已匯出");
+function dateStamp() {
+  return new Date().toISOString().split("T")[0];
+}
+
+// ── 匯入 ───────────────────────────────
+
+function closeImportModal() {
+  els.importModalOverlay?.classList.remove("visible");
 }
 
 function handleFileSelect(e: Event) {
@@ -870,50 +1150,58 @@ function handleFileSelect(e: Event) {
 }
 
 async function handleImport() {
-  const jsonStr = (els.importJson as HTMLTextAreaElement)?.value.trim();
+  const jsonStr = els.importJson?.value.trim();
   if (!jsonStr) {
     showToast("請輸入或選擇 JSON 檔案", true);
     return;
   }
 
+  const importMode = document.querySelector<HTMLInputElement>('input[name="import-mode"]:checked')?.value ?? "merge";
+
   try {
     const data = JSON.parse(jsonStr);
-
-    if (!Array.isArray(data.templates)) {
-      throw new Error("無效的模板格式");
-    }
+    if (!Array.isArray(data.templates)) throw new Error("無效的模板格式");
 
     const now = Date.now();
     const imported: Template[] = data.templates.map((t: Record<string, unknown>) => ({
-      id: crypto.randomUUID(),
+      id: String(t.id ?? crypto.randomUUID()),
       name: String(t.name ?? ""),
       category: String(t.category ?? "自訂"),
       content: String(t.content ?? ""),
       variables: extractVariables(String(t.content ?? "")),
       tags: Array.isArray(t.tags) ? t.tags.map(String) : [],
       isFavorite: Boolean(t.isFavorite),
-      createdAt: now,
+      createdAt: Number(t.createdAt) || now,
       updatedAt: now,
     }));
 
-    await saveTemplates([...state.templates, ...imported]);
+    let finalTemplates: Template[];
+    if (importMode === "replace-all") {
+      finalTemplates = imported;
+    } else if (importMode === "overwrite") {
+      const map = new Map(state.templates.map((t) => [t.id, t]));
+      for (const t of imported) map.set(t.id, t);
+      finalTemplates = Array.from(map.values());
+    } else {
+      // merge: keep existing, add only new IDs
+      const existingIds = new Set(state.templates.map((t) => t.id));
+      const newOnes = imported
+        .filter((t) => !existingIds.has(t.id))
+        .map((t) => ({ ...t, id: crypto.randomUUID() }));
+      finalTemplates = [...state.templates, ...newOnes];
+    }
 
-    // 如果有分類也匯入
+    await saveTemplates(finalTemplates);
+
     if (Array.isArray(data.categories)) {
       const existingNames = new Set(state.categories.map((c) => c.name));
-      const newCategories = data.categories
-        .filter((c: Record<string, unknown>) => {
-          if (typeof c !== "object" || c === null) return false;
-          const obj = c as Record<string, unknown>;
-          return (
-            typeof obj.id === "string" &&
-            typeof obj.name === "string" &&
-            typeof obj.icon === "string" &&
-            typeof obj.order === "number"
-          );
-        })
-        .filter((c: { name: string }) => !existingNames.has(c.name));
-
+      const newCategories = (data.categories as Record<string, unknown>[]).filter((c) =>
+        typeof c.id === "string" &&
+        typeof c.name === "string" &&
+        typeof c.icon === "string" &&
+        typeof c.order === "number" &&
+        !existingNames.has(c.name as string)
+      ) as unknown as Category[];
       if (newCategories.length > 0) {
         await saveCategories([...state.categories, ...newCategories]);
       }
@@ -921,18 +1209,316 @@ async function handleImport() {
 
     await loadData();
     render();
-
-    els.importModalOverlay?.classList.remove("visible");
+    closeImportModal();
     if (els.importJson) els.importJson.value = "";
 
-    showToast(`📥 已匯入 ${imported.length} 個模板`);
+    const delta = finalTemplates.length - state.templates.length;
+    showToast(`📥 匯入完成 (${importMode === "merge" ? `新增 ${Math.abs(delta)}` : `共 ${finalTemplates.length}`} 個模板)`);
   } catch (error) {
     console.error("[Management] Failed to import:", error);
     showToast("匯入失敗，請檢查 JSON 格式", true);
   }
 }
 
+// ── 定時發送 ───────────────────────────────
+
+function openSchedulerModal() {
+  renderSchedulerTasks();
+  populateTaskTemplateSelect();
+  els.schedulerFormSection?.classList.add("hidden");
+  els.schedulerModalOverlay?.classList.add("visible");
+}
+
+function closeSchedulerModal() {
+  els.schedulerModalOverlay?.classList.remove("visible");
+}
+
+function populateTaskTemplateSelect() {
+  const sel = els.taskTemplate;
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— 選擇模板 —</option>' +
+    state.templates.map((t) =>
+      `<option value="${t.id}">${escapeHtml(t.name)}</option>`
+    ).join("");
+}
+
+function renderSchedulerTasks() {
+  const container = els.schedulerTaskList;
+  if (!container) return;
+
+  if (state.scheduledTasks.length === 0) {
+    container.innerHTML = '<div class="empty-state">尚無排程任務</div>';
+    return;
+  }
+
+  container.innerHTML = state.scheduledTasks.map((task) => {
+    const tpl = state.templates.find((t) => t.id === task.templateId);
+    const scheduleDesc = formatScheduleDesc(task);
+    return `
+      <div class="scheduler-task-item ${task.enabled ? "" : "disabled"}" data-id="${task.id}">
+        <div class="scheduler-task-info">
+          <div class="scheduler-task-name">${escapeHtml(task.name)}</div>
+          <div class="scheduler-task-meta">
+            <span>${PLATFORM_URLS[task.platform] ? task.platform : task.platform}</span>
+            <span>·</span>
+            <span>${escapeHtml(tpl?.name ?? "(已刪除)")}</span>
+            <span>·</span>
+            <span>${scheduleDesc}</span>
+          </div>
+        </div>
+        <div class="scheduler-task-actions">
+          <label class="toggle-switch" title="${task.enabled ? "停用" : "啟用"}">
+            <input type="checkbox" class="task-toggle-cb" data-id="${task.id}" ${task.enabled ? "checked" : ""} />
+            <span class="toggle-slider"></span>
+          </label>
+          <button class="edit-task-btn icon-btn" data-id="${task.id}" title="編輯">✏️</button>
+          <button class="delete-task-btn icon-btn delete" data-id="${task.id}" title="刪除">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll(".task-toggle-cb").forEach((cb) => {
+    cb.addEventListener("change", async (e) => {
+      const id = (e.target as HTMLInputElement).dataset.id!;
+      const enabled = (e.target as HTMLInputElement).checked;
+      await handleToggleTask(id, enabled);
+    });
+  });
+  container.querySelectorAll(".edit-task-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = (btn as HTMLElement).dataset.id!;
+      const task = state.scheduledTasks.find((t) => t.id === id);
+      if (task) openSchedulerForm(task);
+    });
+  });
+  container.querySelectorAll(".delete-task-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = (btn as HTMLElement).dataset.id!;
+      handleDeleteTask(id);
+    });
+  });
+}
+
+function formatScheduleDesc(task: ScheduledTask): string {
+  if (task.scheduleType === "once") {
+    return `一次性 ${new Date(task.nextRunAt).toLocaleString("zh-TW")}`;
+  }
+  if (task.scheduleType === "weekly") {
+    const days = ["日","一","二","三","四","五","六"];
+    const daysStr = (task.weekdays ?? []).map((d) => days[d]).join("、");
+    return `每週 ${daysStr} ${task.scheduleTime}`;
+  }
+  return `每天 ${task.scheduleTime}`;
+}
+
+function openSchedulerForm(task: ScheduledTask | null) {
+  const isEdit = task !== null;
+  if (els.schedulerFormTitle) {
+    els.schedulerFormTitle.textContent = isEdit ? "編輯排程任務" : "新增排程任務";
+  }
+  if (els.schedulerTaskId) els.schedulerTaskId.value = task?.id ?? "";
+  if (els.taskName) els.taskName.value = task?.name ?? "";
+  if (els.taskTemplate) els.taskTemplate.value = task?.templateId ?? "";
+  if (els.taskPlatform) els.taskPlatform.value = task?.platform ?? "grok";
+  if (els.taskAutoSubmit) els.taskAutoSubmit.checked = task?.autoSubmit ?? false;
+
+  // Schedule type
+  const schedType: ScheduleType = task?.scheduleType ?? "once";
+  const radio = document.querySelector<HTMLInputElement>(`input[name="schedule-type"][value="${schedType}"]`);
+  if (radio) radio.checked = true;
+  updateScheduleTypeUI(schedType);
+
+  if (schedType === "once") {
+    if (els.taskDatetime && task?.nextRunAt) {
+      const d = new Date(task.nextRunAt);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      els.taskDatetime.value =
+        `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+  } else {
+    if (els.taskTime) els.taskTime.value = task?.scheduleTime ?? "09:00";
+  }
+
+  // Weekdays
+  els.weekdayPicker?.querySelectorAll<HTMLElement>(".weekday-btn").forEach((btn) => {
+    const day = parseInt(btn.dataset.day ?? "0");
+    btn.classList.toggle("active", task?.weekdays?.includes(day) ?? false);
+  });
+
+  renderTaskVariables();
+  if (task?.variables) {
+    // Fill variable inputs with saved values
+    const list = els.taskVariablesList;
+    if (list) {
+      list.querySelectorAll<HTMLInputElement>(".task-var-input").forEach((input) => {
+        const v = input.dataset.varname ?? "";
+        if (task.variables[v] !== undefined) input.value = task.variables[v];
+      });
+    }
+  }
+
+  els.schedulerFormSection?.classList.remove("hidden");
+  els.taskName?.focus();
+}
+
+function renderTaskVariables() {
+  const sel = els.taskTemplate;
+  const group = els.taskVariablesGroup;
+  const list = els.taskVariablesList;
+  if (!sel || !group || !list) return;
+
+  const tplId = sel.value;
+  const tpl = state.templates.find((t) => t.id === tplId);
+  const vars = tpl ? extractVariables(tpl.content) : [];
+
+  if (vars.length === 0) {
+    group.style.display = "none";
+    return;
+  }
+
+  group.style.display = "";
+  list.innerHTML = vars.map((v) => `
+    <div class="task-var-row">
+      <label>${escapeHtml(v.name)}</label>
+      <input type="text" class="task-var-input" data-varname="${escapeHtml(v.name)}"
+             placeholder="${escapeHtml(v.placeholder ?? v.name)}"
+             value="${escapeHtml(v.defaultValue ?? "")}" />
+    </div>
+  `).join("");
+}
+
+function updateScheduleTypeUI(type: ScheduleType) {
+  els.scheduleOnceGroup?.classList.toggle("hidden", type !== "once");
+  els.scheduleRecurringGroup?.classList.toggle("hidden", type === "once");
+  els.scheduleWeekdayGroup?.classList.toggle("hidden", type !== "weekly");
+}
+
+async function handleSaveTask() {
+  const name = els.taskName?.value.trim();
+  const templateId = els.taskTemplate?.value;
+  const platform = els.taskPlatform?.value as ScheduledTask["platform"];
+  const autoSubmit = els.taskAutoSubmit?.checked ?? false;
+  const scheduleType = (document.querySelector<HTMLInputElement>('input[name="schedule-type"]:checked')?.value ?? "once") as ScheduleType;
+  const existingId = els.schedulerTaskId?.value;
+
+  if (!name || !templateId) {
+    showToast("請填寫任務名稱並選擇模板", true);
+    return;
+  }
+
+  // Collect variables
+  const variables: Record<string, string> = {};
+  els.taskVariablesList?.querySelectorAll<HTMLInputElement>(".task-var-input").forEach((inp) => {
+    variables[inp.dataset.varname ?? ""] = inp.value;
+  });
+
+  // Compute nextRunAt
+  let scheduleTime = "";
+  let weekdays: number[] = [];
+  let nextRunAt = 0;
+
+  if (scheduleType === "once") {
+    const dt = els.taskDatetime?.value;
+    if (!dt) { showToast("請選擇執行時間", true); return; }
+    nextRunAt = new Date(dt).getTime();
+    scheduleTime = new Date(dt).toISOString();
+    if (nextRunAt <= Date.now()) { showToast("執行時間必須在未來", true); return; }
+  } else {
+    scheduleTime = els.taskTime?.value ?? "09:00";
+    const [h, m] = scheduleTime.split(":").map(Number);
+    if (scheduleType === "weekly") {
+      weekdays = Array.from(
+        els.weekdayPicker?.querySelectorAll<HTMLElement>(".weekday-btn.active") ?? []
+      ).map((btn) => parseInt(btn.dataset.day ?? "0"));
+      if (weekdays.length === 0) { showToast("請至少選擇一天", true); return; }
+    }
+    const now = new Date();
+    const candidate = new Date();
+    candidate.setHours(h, m, 0, 0);
+    if (candidate.getTime() <= now.getTime()) candidate.setDate(candidate.getDate() + 1);
+    nextRunAt = candidate.getTime();
+  }
+
+  try {
+    const payload: Omit<ScheduledTask, "id" | "createdAt"> = {
+      name,
+      templateId,
+      platform,
+      variables,
+      scheduleType,
+      scheduleTime,
+      weekdays,
+      autoSubmit,
+      enabled: true,
+      nextRunAt,
+    };
+
+    let savedTask: ScheduledTask;
+    if (existingId) {
+      await updateScheduledTask(existingId, payload);
+      savedTask = { ...payload, id: existingId, createdAt: Date.now() };
+    } else {
+      savedTask = await addScheduledTask(payload);
+    }
+
+    // Notify service worker to register alarm
+    safeSend({ type: "SCHEDULE_TASK", task: savedTask });
+
+    state.scheduledTasks = await getScheduledTasks();
+    renderSchedulerTasks();
+    els.schedulerFormSection?.classList.add("hidden");
+    showToast(`⏰ 排程任務已${existingId ? "更新" : "新增"}`);
+  } catch (error) {
+    console.error("[Management] Failed to save task:", error);
+    showToast("儲存失敗", true);
+  }
+}
+
+async function handleDeleteTask(id: string) {
+  const task = state.scheduledTasks.find((t) => t.id === id);
+  if (!task) return;
+  if (!confirm(`確定刪除「${task.name}」？`)) return;
+
+  try {
+    await deleteScheduledTask(id);
+    safeSend({ type: "CANCEL_TASK", taskId: id });
+    state.scheduledTasks = await getScheduledTasks();
+    renderSchedulerTasks();
+    showToast("🗑️ 排程任務已刪除");
+  } catch (error) {
+    console.error("[Management] Failed to delete task:", error);
+    showToast("刪除失敗", true);
+  }
+}
+
+async function handleToggleTask(id: string, enabled: boolean) {
+  try {
+    await updateScheduledTask(id, { enabled });
+    if (enabled) {
+      const task = state.scheduledTasks.find((t) => t.id === id);
+      if (task) safeSend({ type: "SCHEDULE_TASK", task: { ...task, enabled: true } });
+    } else {
+      safeSend({ type: "CANCEL_TASK", taskId: id });
+    }
+    state.scheduledTasks = await getScheduledTasks();
+    renderSchedulerTasks();
+    showToast(`⏰ 任務已${enabled ? "啟用" : "停用"}`);
+  } catch (error) {
+    console.error("[Management] Failed to toggle task:", error);
+  }
+}
+
 // ── 工具函式 ───────────────────────────────
+
+/** Fire-and-forget sendMessage that silences the "Receiving end does not exist" error
+ *  which occurs normally when the service worker is sleeping. */
+function safeSend(msg: object): void {
+  chrome.runtime.sendMessage(msg).catch(() => {
+    // SW may be sleeping; alarm scheduling is persisted via storage and will
+    // be re-registered by scheduleAllEnabledTasks() on next SW wake.
+  });
+}
 
 function escapeHtml(text: string): string {
   const div = document.createElement("div");

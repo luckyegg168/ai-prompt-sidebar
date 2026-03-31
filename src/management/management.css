@@ -865,3 +865,246 @@ body {
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: var(--mgmt-text-secondary);
 }
+
+/* ════════════════════════════════════════════
+   Export / Import / Scheduler Modal Additions
+   ════════════════════════════════════════════ */
+
+.modal-large { max-width: 680px; }
+.hidden { display: none !important; }
+
+/* ── Radio options ── */
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 4px 0;
+  font-size: 13px;
+}
+.radio-option input[type="radio"] { cursor: pointer; }
+
+/* ── Export modal ── */
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+.export-selection-area {
+  border: 1px solid var(--mgmt-border);
+  border-radius: var(--mgmt-radius-sm);
+  padding: 12px;
+}
+.export-select-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.export-count-badge {
+  font-size: 12px;
+  color: var(--mgmt-text-secondary);
+  background: var(--mgmt-sidebar-bg);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.export-category-tree { max-height: 300px; overflow-y: auto; }
+.export-category-node { margin-bottom: 10px; }
+.export-category-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.export-template-list {
+  margin-left: 24px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.export-template-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.export-tpl-name { color: var(--mgmt-text-secondary); }
+
+/* ── Import mode selector ── */
+.import-mode-selector {
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--mgmt-border);
+  padding-bottom: 12px;
+}
+.import-mode-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mgmt-text-secondary);
+  margin-bottom: 6px;
+}
+
+/* ── Scheduler modal ── */
+.scheduler-modal-content { display: flex; flex-direction: column; gap: 20px; }
+.scheduler-section { display: flex; flex-direction: column; gap: 10px; }
+.scheduler-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.scheduler-section-header h3 { font-size: 14px; font-weight: 600; margin: 0; }
+
+.btn-sm { padding: 4px 12px; font-size: 12px; }
+
+/* Scheduler task list */
+.scheduler-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.scheduler-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--mgmt-border);
+  border-radius: var(--mgmt-radius-sm);
+  padding: 10px 12px;
+  gap: 12px;
+}
+.scheduler-task-item.disabled { opacity: 0.6; }
+.scheduler-task-info { flex: 1; min-width: 0; }
+.scheduler-task-name { font-weight: 600; font-size: 13px; margin-bottom: 3px; }
+.scheduler-task-meta {
+  font-size: 11px;
+  color: var(--mgmt-text-secondary);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.scheduler-task-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* ── Scheduler form ── */
+.scheduler-form-section {
+  border-top: 1px solid var(--mgmt-border);
+  padding-top: 16px;
+}
+.scheduler-form-section h3 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+.form-group { margin-bottom: 12px; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.form-group input[type="text"],
+.form-group input[type="datetime-local"],
+.form-group input[type="time"],
+.form-group select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--mgmt-border);
+  border-radius: var(--mgmt-radius-sm);
+  background: var(--mgmt-sidebar-bg);
+  color: var(--mgmt-text);
+  font-size: 13px;
+  box-sizing: border-box;
+}
+.form-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--mgmt-text-secondary);
+  margin-top: 4px;
+}
+.schedule-type-row { display: flex; gap: 16px; flex-wrap: wrap; }
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* ── Weekday picker ── */
+.weekday-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+.weekday-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--mgmt-border);
+  border-radius: 99px;
+  background: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--mgmt-text-secondary);
+  transition: background 0.15s, color 0.15s;
+}
+.weekday-btn.active {
+  background: var(--mgmt-primary);
+  color: #fff;
+  border-color: var(--mgmt-primary);
+}
+
+/* ── Toggle switch ── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--mgmt-border);
+  border-radius: 99px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--mgmt-primary); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+/* ── Task variable inputs ── */
+.task-variables-list { display: flex; flex-direction: column; gap: 8px; }
+.task-var-row { display: flex; align-items: center; gap: 10px; }
+.task-var-row label {
+  font-size: 12px;
+  color: var(--mgmt-text-secondary);
+  min-width: 100px;
+  font-family: monospace;
+  white-space: nowrap;
+}
+.task-var-input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--mgmt-border);
+  border-radius: var(--mgmt-radius-sm);
+  background: var(--mgmt-sidebar-bg);
+  color: var(--mgmt-text);
+  font-size: 12px;
+}
+
+/* Scrollbar for scheduler task list */
+.scheduler-task-list::-webkit-scrollbar { width: 6px; }
+.scheduler-task-list::-webkit-scrollbar-track { background: transparent; }
+.scheduler-task-list::-webkit-scrollbar-thumb {
+  background: var(--mgmt-border);
+  border-radius: 3px;
+}

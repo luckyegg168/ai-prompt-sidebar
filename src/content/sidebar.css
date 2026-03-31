@@ -295,47 +295,41 @@
   background: var(--aps-bg-secondary);
   border: 1px solid var(--aps-border);
   border-radius: var(--aps-radius);
-  padding: 12px;
-  margin-bottom: 8px;
+  padding: 6px 10px;
+  margin-bottom: 3px;
   cursor: pointer;
-  transition: all var(--aps-transition);
+  transition: background var(--aps-transition), border-color var(--aps-transition);
 }
 
 .aps-template-card:hover {
   border-color: var(--aps-accent);
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
-}
-
-.aps-template-card .aps-card-name {
-  font-weight: 600;
-  font-size: 13px;
-  margin-bottom: 4px;
-}
-
-.aps-template-card .aps-card-preview {
-  color: var(--aps-text-secondary);
-  font-size: 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.aps-template-card .aps-card-tags {
-  margin-top: 6px;
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.aps-var-tag {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
   background: var(--aps-accent-light);
+}
+
+.aps-card-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.aps-card-name {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aps-var-badge {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-family: monospace;
   color: var(--aps-accent);
-  font-size: 11px;
+  background: var(--aps-accent-light);
+  padding: 1px 5px;
+  border-radius: 3px;
+  cursor: help;
 }
 
 /* ── Variable Form (detail view) ───────────── */
@@ -644,19 +638,12 @@
   color: #fff;
 }
 
-/* ── Card Header (name + star) ─────────────── */
-.aps-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-}
-
+/* ── Star Button ───────────────────────────── */
 .aps-star-btn {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   color: var(--aps-text-secondary);
   padding: 0;
   line-height: 1;
@@ -672,14 +659,7 @@
   color: #eab308;
 }
 
-/* ── Tag Pills on Cards ────────────────────── */
-.aps-card-tag-pills {
-  margin-top: 6px;
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
+/* ── Tag Pills on Cards (kept for management page) ─ */
 .aps-tag-pill {
   display: inline-block;
   padding: 1px 6px;
@@ -692,11 +672,6 @@
 .aps-dark .aps-tag-pill {
   background: #1e3a5f;
   color: #93c5fd;
-}
-
-.aps-tag-more {
-  background: var(--aps-bg-secondary);
-  color: var(--aps-text-secondary);
 }
 
 /* ── Favorites active button ───────────────── */

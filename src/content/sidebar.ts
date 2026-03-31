@@ -292,5 +292,16 @@ import { TemplateUI, showToast } from "./template-ui";
           .catch(() => showToast("重設失敗，請重試", true));
       });
     }
+    if (msg.type === "SCHEDULED_PROMPT") {
+      const content: string = msg.content ?? "";
+      const autoSubmit: boolean = msg.autoSubmit ?? false;
+      const inputEl = adapter.getInputElement();
+      if (inputEl) {
+        adapter.setText(inputEl, content);
+        if (autoSubmit) {
+          setTimeout(() => adapter.submit(inputEl), 300);
+        }
+      }
+    }
   });
 })();

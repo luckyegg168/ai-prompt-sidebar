@@ -3,7 +3,7 @@
   "name": "AI Prompt Sidebar",
   "version": "1.0.0",
   "description": "在 AI 聊天平台注入浮動側邊欄，提供金融分析、AI 圖片、AI 影片提示詞模板，支援一鍵填入並送出。",
-  "permissions": ["storage", "activeTab"],
+  "permissions": ["storage", "activeTab", "alarms", "notifications"],
   "optional_permissions": ["contextMenus"],
   "host_permissions": [
     "https://x.com/*",
